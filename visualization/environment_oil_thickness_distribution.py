@@ -1,6 +1,6 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from data.data_parser import DataParser
+from data.data_loader import DataLoader
 import random
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -31,17 +31,17 @@ def get_circle_thickness_distribution(
 
 def fill_environment_with_reflectivity_data(
         environment: np.ndarray,
-        data_parser: DataParser
+        data_loader: DataLoader
 ) -> np.ndarray:
     populated_environment = []
     for x in range(len(environment)):
         temp_populated_environment = []
         for y in range(len(environment[x])):
             thickness = environment[x][y]
-            thickness_index = np.where(data_parser.all_thicknesses == thickness)[0]
+            thickness_index = np.where(data_loader.all_thicknesses == thickness)[0]
             # Get thickness index
-            random_data_point_index = random.randint(0, len(data_parser.all_thicknesses_data[thickness_index]))
-            ref = data_parser.all_thicknesses_data[thickness_index][random_data_point_index]
+            random_data_point_index = random.randint(0, len(data_loader.all_thicknesses_data[thickness_index]))
+            ref = data_loader.all_thicknesses_data[thickness_index][random_data_point_index]
             temp_populated_environment.append(ref)
 
         populated_environment.append(temp_populated_environment)

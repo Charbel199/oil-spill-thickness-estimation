@@ -3,7 +3,7 @@ import sys
 import numpy as np
 
 
-class DataParser(object):
+class DataLoader(object):
     def __init__(self):
         self.all_thicknesses_data: np.ndarray = np.array()
         self.all_thicknesses: np.ndarray = np.array()
