@@ -6,6 +6,7 @@ import numpy as np
 class DataParser(object):
     def __init__(self):
         self.all_thicknesses_data: np.ndarray = np.array()
+        self.all_thicknesses: np.ndarray = np.array()
 
     def load_data(self,
                   synthetic_data_file_name: str,
@@ -43,3 +44,4 @@ class DataParser(object):
         all_thicknesses_data = np.array(all_thicknesses_data)
         print(all_thicknesses_data.shape)
         self.all_thicknesses_data = all_thicknesses_data
+        self.all_thicknesses = np.array(range(smallest_thickness, largest_thickness + 1, step_size))
