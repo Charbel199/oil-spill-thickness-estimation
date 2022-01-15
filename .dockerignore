@@ -1,0 +1,7 @@
+.env
+__pycache__
+.idea
+*.log
+*.html
+*.cprof
+*.pkl
