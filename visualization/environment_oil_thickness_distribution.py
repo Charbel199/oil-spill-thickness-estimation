@@ -75,6 +75,47 @@ def visualize_environment(
         plt.show()
 
 
+def compare_environments(
+        environment: np.ndarray,
+        populated_environment: np.ndarray,
+        output_file_name: str = 'test',
+        file_type: str = 'svg',
+        fig_size_width: int = 25,
+        fig_size_height: int = 20,
+        font_size: int = 32,
+        save_fig: bool = False,
+        show_fig: bool = True
+):
+    fig, axs = plt.subplots(ncols=2, nrows=1, figsize=(fig_size_width, fig_size_height))
+    # e = np.squeeze(estimated_env, axis=2)
+
+    font = {'family': 'normal',
+            'weight': 'regular',
+            'size': font_size}
+
+    plt.rc('font', **font)
+
+    # Left side
+    divider = make_axes_locatable(axs[0])
+    cax = divider.append_axes('right', size='7%', pad=0.4)
+    im = axs[0].imshow(environment, cmap='jet')
+    axs[0].grid()
+    fig.colorbar(im, cax=cax, orientation='vertical')
+
+    # Right side
+    divider = make_axes_locatable(axs[1])
+    cax = divider.append_axes('right', size='7%', pad=0.4)
+    im = axs[1].imshow(populated_environment, cmap='jet')
+    axs[1].grid()
+    fig.colorbar(im, cax=cax, orientation='vertical')
+
+    if save_fig:
+        plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
+    if show_fig:
+        plt.show()
+
+
 if __name__ == "__main__":
     env = get_circle_thickness_distribution()
     visualize_environment(env)
+    compare_environments(env,env)
