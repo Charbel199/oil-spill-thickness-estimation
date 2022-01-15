@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from data.data_parser import DataParser
 import random
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
 def get_circle_thickness_distribution(
@@ -49,7 +50,31 @@ def fill_environment_with_reflectivity_data(
     return populated_environment
 
 
+def visualize_environment(
+        environment: np.ndarray,
+        output_file_name: str = 'test',
+        file_type: str = 'svg',
+        fig_size: int = 25,
+        font_size: int = 25,
+        save_fig: bool = False,
+        show_fig: bool = True
+):
+    font = {'family': 'sans-serif',
+            'weight': 'bold',
+            'size': font_size}
+
+    plt.rc('font', **font)
+    fig, ax = plt.subplots(figsize=(fig_size, fig_size))
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size='5%', pad=0.2)
+    im = ax.imshow(environment, cmap='jet')
+    fig.colorbar(im, cax=cax, orientation='vertical')
+    if save_fig:
+        plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
+    if show_fig:
+        plt.show()
+
+
 if __name__ == "__main__":
     env = get_circle_thickness_distribution()
-    plt.imshow(env)
-    plt.show()
+    visualize_environment(env)
