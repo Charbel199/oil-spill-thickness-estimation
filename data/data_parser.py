@@ -45,3 +45,16 @@ class DataParser(object):
         print(all_thicknesses_data.shape)
         self.all_thicknesses_data = all_thicknesses_data
         self.all_thicknesses = np.array(range(smallest_thickness, largest_thickness + 1, step_size))
+
+    def save_data(self,
+                  file_name: str):
+        np.save(f'{file_name}_x_data.npy', self.all_thicknesses_data)
+        np.save(f'{file_name}_y_data.npy', self.all_thicknesses)
+
+    def load_data(self,
+                  file_name: str):
+        try:
+            self.all_thicknesses_data = np.load(f'{file_name}_x_data.npy')
+            self.all_thicknesses = np.load(f'{file_name}_y_data.npy')
+        except OSError:
+            print('Files not found')
