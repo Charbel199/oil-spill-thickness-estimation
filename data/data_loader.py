@@ -54,7 +54,7 @@ class DataLoader(object):
     def load_data(self,
                   file_name: str):
         try:
-            self.all_thicknesses_data = np.load(f'{file_name}_x_data.npy')
-            self.all_thicknesses = np.load(f'{file_name}_y_data.npy')
+            self.all_thicknesses_data = np.array(np.load(f'{file_name}_x_data.npy'))
+            self.all_thicknesses = np.array(np.load(f'{file_name}_y_data.npy'))
         except OSError:
             print('Files not found')
