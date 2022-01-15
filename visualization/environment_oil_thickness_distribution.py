@@ -86,9 +86,8 @@ def compare_environments(
         save_fig: bool = False,
         show_fig: bool = True
 ):
+    # Setup
     fig, axs = plt.subplots(ncols=2, nrows=1, figsize=(fig_size_width, fig_size_height))
-    # e = np.squeeze(estimated_env, axis=2)
-
     font = {'family': 'normal',
             'weight': 'regular',
             'size': font_size}
@@ -118,4 +117,4 @@ def compare_environments(
 if __name__ == "__main__":
     env = get_circle_thickness_distribution()
     visualize_environment(env)
-    compare_environments(env,env)
+    compare_environments(env, env)
