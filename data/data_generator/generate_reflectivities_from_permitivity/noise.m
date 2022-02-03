@@ -1,4 +1,4 @@
-function [reflectivities_with_noise]= noise(R, thickness, variance_noise) 
+function [reflectivities_with_noise]= noise(R, permittivity, variance_noise)
 % R: Theoretical reflectivities for a specific thickness
 % thickness: Corresponding thickness
 % variance_noise: Variance
