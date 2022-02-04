@@ -38,10 +38,10 @@ def fill_environment_with_reflectivity_data(
         temp_populated_environment = []
         for y in range(len(environment[x])):
             thickness = environment[x][y]
-            thickness_index = np.where(data_loader.all_thicknesses == thickness)[0]
+            thickness_index = np.where(data_loader.all_data_y == thickness)[0]
             # Get thickness index
-            random_data_point_index = random.randint(0, len(data_loader.all_thicknesses_data[thickness_index]))
-            ref = data_loader.all_thicknesses_data[thickness_index][random_data_point_index]
+            random_data_point_index = random.randint(0, len(data_loader.all_data_x[thickness_index]))
+            ref = data_loader.all_data_x[thickness_index][random_data_point_index]
             temp_populated_environment.append(ref)
 
         populated_environment.append(temp_populated_environment)
