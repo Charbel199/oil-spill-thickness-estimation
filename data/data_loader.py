@@ -24,11 +24,14 @@ class DataLoader(object):
         value = smallest_value
         values = []
         while value <= largest_value:
-            value = round(value, 2)
+
             if int(value) == value:
                 value = int(value)
             values.append(value)
             value += step_size
+            value = round(value, 2)
+
+        print(values)
         for val in values:
             if lower_bound_for_real_data != 0 and upper_bound_for_real_data != 0 and \
                     (lower_bound_for_real_data <= val <= upper_bound_for_real_data):
@@ -46,13 +49,13 @@ class DataLoader(object):
                 counter += 1
                 all_data_x.append(numbers)
                 all_data_y.append(val)
-                if counter > max_number_of_rows:
+                if counter >= max_number_of_rows:
                     break
 
             file.close()
 
         all_data = np.array(all_data_x)
-        print(all_data.shape)
+
         self.all_data_x = all_data
         self.all_data_y = np.array(all_data_y)
 
