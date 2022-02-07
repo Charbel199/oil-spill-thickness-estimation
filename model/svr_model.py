@@ -6,9 +6,9 @@ from sklearn import metrics
 from data.data_loader import DataLoader
 from sklearn.svm import SVR
 import pickle
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.metrics import confusion_matrix
-
+import matplotlib.pyplot as plot
 
 class SVRModel(object):
     def __init__(self,
@@ -36,7 +36,7 @@ class SVRModel(object):
         self.model.fit(self.x_train, self.y_train)
         print('Done training...')
         if save_file:
-            self.save_model(output_file_name)
+            self.save_model(f"generated_models/{output_file_name}")
 
     def save_model(self, output_file_name: str):
         pickle.dump(self.model, open(f"{output_file_name}.sav", 'wb'))
@@ -47,11 +47,17 @@ class SVRModel(object):
         print(f'Loaded model from {file_name}')
 
     def evaluate_model(self,
+                       file_name: str,
                        largest_value=10,
-                       include_classification=False):
+                       include_classification=False,
+                       plot_data = True,
+                       log_eval = True):
         print("Evaluating model ...")
         y_pred = self.model.predict(self.x_test)
-        print(f'R2 score: {r2_score(self.y_test, y_pred)}')
+        r2 = r2_score(self.y_test, y_pred)
+        mse = mean_squared_error(self.y_test, y_pred)
+        print(f'R2 score: {r2}')
+        print(f'MSE: {mse}')
 
         if include_classification:
             y_pred_classification = [round(pred) if pred <= largest_value else largest_value for pred in y_pred]
@@ -60,6 +66,16 @@ class SVRModel(object):
             classification_confusion_matrix = confusion_matrix(self.y_test, y_pred_classification)
             print(f'Report: {classification_report}')
             print(f'Confusion matrix: {classification_confusion_matrix}')
+        if plot_data:
+            plot.scatter(self.y_test, y_pred, color='red')
+
+            plot.xlabel('True Value')
+            plot.ylabel('Predicted Value')
+            plot.show()
+        if log_eval:
+            file_object = open('logs.txt', 'a')
+            file_object.write(f"\n{file_name} \n R2 --> {r2} \n MSE --> {mse} \n=====================================\n")
+            file_object.close()
 
     def predict(self, test_x):
         y_pred = self.model.predict(test_x)
