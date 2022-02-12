@@ -3,9 +3,9 @@ import sys
 from data.data_loader import DataLoader
 from model.svr_model import SVRModel
 
-file_name ='3mm-50observations-4freqs-variance0.02-'
-model_name = '3mm-50observations-4freqs-variance0.02-C10-2000'
-new_model = True
+file_name ='5mm-50observations-4freqs-variance0.02-'
+model_name = '5mm-4freqs-variance0.001-2000'
+new_model = False
 
 loader = DataLoader()
 loader.load_data(synthetic_data_file_name=f"generated_data/{file_name}",
@@ -35,7 +35,7 @@ model.load_training_data()
 if new_model:
     model.train_model(output_file_name=model_name, save_file=True)
 else:
-    model.load_model(model_name)
+    model.load_model(f"generated_models/{model_name}")
 
 model.evaluate_model(file_name=model_name,largest_value=sys.maxsize, log_eval = True)
 
