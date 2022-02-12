@@ -7,6 +7,7 @@ function []= export_to_file(reflectivities, file_name, number_of_frequencies, id
 % Save data into files
 file_name = strcat(file_name,num2str(identifier),'.txt');
 file=fopen(file_name,'w');
+
 for i=1: length(reflectivities)
     row = '';
     for frequency=1:number_of_frequencies

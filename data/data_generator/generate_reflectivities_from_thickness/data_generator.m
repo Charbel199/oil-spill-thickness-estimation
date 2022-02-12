@@ -24,8 +24,8 @@ n1 = sqrt(eps1);
 n2= sqrt(eps2);
 n3= sqrt(eps3);
 
-variance_noise= 0.03;
-file_name = "final";
+variance_noise= 0.01;
+file_name = "fromThicknessLowVariance";
 
 r = zeros(length(lambda),length(thickness));
 R = zeros(length(lambda),length(thickness)); % Number of frequencies x Number of thicknesses
