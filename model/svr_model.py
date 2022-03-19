@@ -8,11 +8,11 @@ class SVRModel(Model):
     def __init__(self, data_loader: DataLoader, **kwargs):
         super().__init__(data_loader)
 
-        self.model = self.create_svr(kwargs)
+        self.model = self.create_svr(**kwargs)
 
     def train_model(self,
                     output_file_name: str,
-                    output_file_extension: str = "h5",
+                    output_file_extension: str = "sav",
                     save_file: bool = False,
                     epochs=10):
         # Train model
