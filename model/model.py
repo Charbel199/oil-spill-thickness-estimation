@@ -7,6 +7,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plot
 from sklearn import preprocessing
 from abc import abstractmethod
+from typing import List
 
 
 class Model(object):
@@ -130,12 +131,19 @@ class Model(object):
         # Log evaluation
         if log_evaluation:
             file_object = open(f'evaluation_logs/{model_name}.txt', 'a')
-            file_object.write(f"\n{model_name}\n {evaluation} \n=====================================\n")
+            file_object.write(f"\n{model_name}\n {self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
 
-        print(f"Evaluation:\n{evaluation}")
+        print(f"Evaluation:\n{self.extract_evaluation(evaluation)}")
 
     @staticmethod
     def _get_max_index(np_array: np.ndarray):
         l = np_array.tolist()
         return l.index(max(l))
+
+    @staticmethod
+    def extract_evaluation(evaluation: List):
+        evaluation_text = ""
+        for eval_line in evaluation:
+            evaluation_text += eval_line
+        return evaluation_text
