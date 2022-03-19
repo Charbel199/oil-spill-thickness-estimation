@@ -59,6 +59,8 @@ def fill_environment_with_reflectivity_data_2_outputs(
         environment: np.ndarray,
         data_loader: DataLoader,
         model,
+        permittivity_index = 0,
+        thickness_index = 1,
         selected_permittivity=3.3,
         is_multi_output=False,
         is_thickness=False
@@ -66,27 +68,27 @@ def fill_environment_with_reflectivity_data_2_outputs(
     populated_environment = []
 
     if is_multi_output:
-        loaded_thicknesses = model.y_test[np.where(model.y_test[:, 1] == selected_permittivity)]
+        loaded_thicknesses = model.y_test[np.where(model.y_test[:, permittivity_index] == selected_permittivity)]
     else:
         loaded_thicknesses = model.y_test
-    loaded_x = model.x_test[np.where(model.y_test[:, 1] == selected_permittivity)]
+    loaded_x = model.x_test[np.where(model.y_test[:, permittivity_index] == selected_permittivity)]
     for x in range(len(environment)):
         temp_populated_environment = []
         for y in range(len(environment[x])):
             thickness = environment[x][y]
             if (isinstance(thickness, float)):
                 thickness = round(thickness, 2)
-            thickness_index = np.where(loaded_thicknesses[:, 0] == thickness)[0]
+            possible_thickness_indices = np.where(loaded_thicknesses[:, thickness_index] == thickness)[0]
             # Get thickness index
-            # print(f"thickness: {thickness}, thickness index: {thickness_index}, len: {len(loaded_x[thickness_index]) - 1}")
-            random_data_point_index = random.randint(0, len(loaded_x[thickness_index]) - 1)
-            test = loaded_x[thickness_index][random_data_point_index]
+            # print(f"thickness: {thickness}, thickness index: {possible_thickness_indices}, len: {len(loaded_x[possible_thickness_indices]) - 1}")
+            random_data_point_index = random.randint(0, len(loaded_x[possible_thickness_indices]) - 1)
+            test = loaded_x[possible_thickness_indices][random_data_point_index]
             temp_populated_environment.append(test)
 
         if is_thickness:
-            predicted_values = model.predict(np.array(temp_populated_environment))[:, 0]
+            predicted_values = model.predict(np.array(temp_populated_environment))[:, thickness_index]
         else:
-            predicted_values = model.predict(np.array(temp_populated_environment))[:, 1]
+            predicted_values = model.predict(np.array(temp_populated_environment))[:, permittivity_index]
         populated_environment.append(predicted_values)
 
     populated_environment = np.array(populated_environment)
