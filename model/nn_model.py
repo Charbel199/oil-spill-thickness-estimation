@@ -43,7 +43,7 @@ class NNModel(Model):
 
         optimizer = kwargs.get('optimizer', "Adam")
         learning_rate = kwargs.get('learning_rate', 0.001)
-        loss = kwargs.get('learning_rate', 'categorical_crossentropy')
+        loss = kwargs.get('loss', 'categorical_crossentropy')
         metrics = kwargs.get('metrics', ["accuracy"])
         print_summary = kwargs.get('print_summary', True)
 
