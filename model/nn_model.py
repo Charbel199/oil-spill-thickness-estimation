@@ -8,8 +8,9 @@ from typing import List
 
 class NNModel(Model):
     def __init__(self, data_loader: DataLoader, network_layers: List, **kwargs):
-        super().__init__(data_loader)
-        self.model = self.create_neural_network(network_layers, **kwargs)
+        super().__init__(data_loader, **kwargs)
+        self.network_layers = network_layers
+        self.model = self.create_neural_network(network_layers)
 
     def train_model(self,
                     output_file_name: str,
@@ -37,15 +38,17 @@ class NNModel(Model):
         self.model = tf.keras.models.load_model(f'{file_name}.{extension}')
         print(f'Loaded model from {file_name}.{extension}')
 
-    @staticmethod
-    def create_neural_network(neural_network: List,
-                              **kwargs):
+    def evaluation_signature(self) -> str:
+        return f"Neural Network: \n{self.network_layers}\noptimizer={self.optimizer}\nlearning rate={self.learning_rate}\nloss={self.loss}\nmetrics={self.metrics}"
 
-        optimizer = kwargs.get('optimizer', "Adam")
-        learning_rate = kwargs.get('learning_rate', 0.001)
-        loss = kwargs.get('loss', 'categorical_crossentropy')
-        metrics = kwargs.get('metrics', ["accuracy"])
-        print_summary = kwargs.get('print_summary', True)
+    def parse_args(self, **kwargs):
+        self.optimizer = kwargs.get('optimizer', "Adam")
+        self.learning_rate = kwargs.get('learning_rate', 0.001)
+        self.loss = kwargs.get('loss', 'categorical_crossentropy')
+        self.metrics = kwargs.get('metrics', ["accuracy"])
+        self.print_summary = kwargs.get('print_summary', True)
+
+    def create_neural_network(self, neural_network: List):
 
         # Generating nn layers
         nn_layers = []
@@ -57,14 +60,14 @@ class NNModel(Model):
         model = tf.keras.models.Sequential(nn_layers)
 
         # Optimizer
-        if optimizer == "Adam":
-            opt = tf.keras.optimizers.Adam(learning_rate=learning_rate)
+        if self.optimizer == "Adam":
+            opt = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
         else:
-            opt = optimizer
+            opt = self.optimizer
 
         model.compile(optimizer=opt,
-                      loss=loss,
-                      metrics=metrics)
-        if print_summary:
+                      loss=self.loss,
+                      metrics=self.metrics)
+        if self.print_summary:
             model.summary()
         return model

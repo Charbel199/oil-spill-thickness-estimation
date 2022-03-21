@@ -6,9 +6,8 @@ import pickle
 
 class SVRModel(Model):
     def __init__(self, data_loader: DataLoader, **kwargs):
-        super().__init__(data_loader)
-
-        self.model = self.create_svr(**kwargs)
+        super().__init__(data_loader, **kwargs)
+        self.model = self.create_svr()
 
     def train_model(self,
                     output_file_name: str,
@@ -31,11 +30,14 @@ class SVRModel(Model):
         self.model = pickle.load(open(f'{file_name}.{extension}', 'rb'))
         print(f'Loaded model from {file_name}.{extension}')
 
-    @staticmethod
-    def create_svr(**kwargs):
-        kernel = kwargs.get('kernel', "rbf")
-        C = kwargs.get('C', 100)
-        epsilon = kwargs.get('epsilon', 0.1)
+    def evaluation_signature(self) -> str:
+        return f"SVR: C={self.C}, kernel={self.kernel}, epsilon={self.epsilon}"
 
-        model = SVR(kernel=kernel, C=C, epsilon=epsilon)
+    def parse_args(self, **kwargs):
+        self.kernel = kwargs.get('kernel', "rbf")
+        self.C = kwargs.get('C', 100)
+        self.epsilon = kwargs.get('epsilon', 0.1)
+
+    def create_svr(self):
+        model = SVR(kernel=self.kernel, C=self.C, epsilon=self.epsilon)
         return model

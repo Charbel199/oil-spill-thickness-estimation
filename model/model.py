@@ -12,7 +12,8 @@ from typing import List
 
 class Model(object):
     def __init__(self,
-                 data_loader: DataLoader):
+                 data_loader: DataLoader, **kwargs):
+        self.parse_args(**kwargs)
         self.x_train, self.x_test, self.y_train, self.y_test = None, None, None, None
         self.data_loader = data_loader
         self.model = None
@@ -85,6 +86,14 @@ class Model(object):
         y_pred = self.model.predict(x_test)
         return y_pred
 
+    @abstractmethod
+    def evaluation_signature(self) -> str:
+        pass
+
+    @abstractmethod
+    def parse_args(self, **kwargs):
+        pass
+
     def evaluate_model(self,
                        model_name: str,
                        include_regression_metrics=True,
@@ -97,7 +106,7 @@ class Model(object):
 
         self.model.evaluate(self.x_test, self.y_test, verbose=2)
         self.y_pred = self.model.predict(self.x_test)
-
+        evaluation.append(self.evaluation_signature())
         # Regression Metrics
         if include_regression_metrics:
             # R2 score
@@ -105,8 +114,8 @@ class Model(object):
             # MSE
             mse = mean_squared_error(self.y_test, self.y_pred)
 
-            evaluation.append(f'R2 score: {r2}\n')
-            evaluation.append(f'MSE: {mse}\n')
+            evaluation.append(f'R2 score: {r2}')
+            evaluation.append(f'MSE: {mse}')
 
         # Classification Metrics
         if include_classification_metrics:
@@ -119,8 +128,8 @@ class Model(object):
             classification_report = skmetrics.classification_report(y_test_classification, y_pred_classification)
             classification_confusion_matrix = confusion_matrix(y_test_classification, y_pred_classification)
 
-            evaluation.append(f'Report: \n{classification_report}\n')
-            evaluation.append(f'Confusion matrix: \n{classification_confusion_matrix}\n')
+            evaluation.append(f'Report: \n{classification_report}')
+            evaluation.append(f'Confusion matrix: \n{classification_confusion_matrix}')
 
             if plot_classification_data:
                 plot.scatter(y_test_classification, y_pred_classification, color='red')
@@ -131,7 +140,7 @@ class Model(object):
         # Log evaluation
         if log_evaluation:
             file_object = open(f'evaluation_logs/{model_name}.txt', 'a')
-            file_object.write(f"\n{model_name}\n {self.extract_evaluation(evaluation)} \n=====================================\n")
+            file_object.write(f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
 
         print(f"Evaluation:\n{self.extract_evaluation(evaluation)}")
@@ -145,5 +154,5 @@ class Model(object):
     def extract_evaluation(evaluation: List):
         evaluation_text = ""
         for eval_line in evaluation:
-            evaluation_text += eval_line
+            evaluation_text += eval_line+"\n"
         return evaluation_text
