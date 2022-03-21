@@ -3,21 +3,9 @@ from model.svr_model import SVRModel
 from model.nn_model import NNModel
 from visualization import error_bars, points_cloud
 
+# Initial parameters
 file_name = 'thickness-9freqs-variance0.001-'
 model_name = 'new-WITHOUT0-nn-v13-2outputs-thickness-9freqs-variance0.001-10000'
-# model_name = 'nn-v3-2outputs-thickness-9freqs-variance0.003-10000'
-new_model = False
-
-loader = DataLoader()
-
-
-loader.load_data_from_file(
-    file_name=f"generated_data/{file_name}",
-    file_format="{}permittivity{}-{}.txt",
-    possible_output_values=[(2.8, 3.3, 0.1), (1, 10, 1)],
-    max_number_of_rows=10000)
-
-
 network_layers = [
     ["Input", 9],
     ["Dense", 12, "relu"],
@@ -25,20 +13,29 @@ network_layers = [
     ["Dense", 12, "relu"],
     ["Dense", 2, "linear"]
 ]
+new_model = True
+
+# Data
+loader = DataLoader()
+loader.load_data_from_file(
+    file_name=f"generated_data/{file_name}",
+    file_format="{}permittivity{}-{}.txt",
+    possible_output_values=[(2.8, 3.3, 0.1), (1, 10, 1)],
+    max_number_of_rows=10000)
+
+# Training and evaluation
 model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True)
 model.load_model_data(test_size=0.2, is_classification_problem=False, normalize_output=False)
 if new_model:
     model.train_model(output_file_name=model_name, save_file=True, epochs=5)
 else:
     model.load_model(f"generated_models/{model_name}")
-
 model.evaluate_model(model_name=model_name, log_evaluation=True, include_classification_metrics=False)
 
 # size_to_view = 40
 # y_pred = model.predict(model.x_test[0:size_to_view])
 # for i in range(len(y_pred)):
 #     print(f"{(model.y_test[i])} --> {(y_pred[i])}")
-
 
 
 save_figs = False
@@ -63,4 +60,3 @@ populated_env_thickness = e.fill_environment_with_reflectivity_data_2_outputs(en
                                                                               selected_permittivity=selected_permittivity)
 # e.compare_environments(env, populated_env_permittivity, save_fig=save_figs, output_file_name="Spill vs Permittivity view")
 e.compare_two_environments(env, populated_env_thickness, save_fig=save_figs, output_file_name="Spill vs Thickness view")
-
