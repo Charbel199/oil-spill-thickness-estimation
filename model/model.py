@@ -8,6 +8,7 @@ import matplotlib.pyplot as plot
 from sklearn import preprocessing
 from abc import abstractmethod
 from typing import List
+import os
 
 
 class Model(object):
@@ -82,6 +83,10 @@ class Model(object):
         # y = 3 -> y = [0 0 0 1 0 0 0 0 0 0 0 0]
         return np.array(y_data_preprocessed)
 
+    @staticmethod
+    def check_if_model_exists(model_path):
+        return os.path.exists(model_path)
+
     def predict(self, x_test):
         y_pred = self.model.predict(x_test)
         return y_pred
@@ -100,7 +105,8 @@ class Model(object):
                        include_classification_metrics=False,
                        largest_classification_value=10,
                        plot_classification_data=False,
-                       log_evaluation=True):
+                       log_evaluation=True,
+                       log_path = None):
         print("Evaluating model ...")
         evaluation = []
 
@@ -139,7 +145,8 @@ class Model(object):
 
         # Log evaluation
         if log_evaluation:
-            file_object = open(f'evaluation_logs/{model_name}.txt', 'a')
+            evaluation_log_path = 'evaluation_logs' if not log_path else f'evaluation_logs/{log_path}'
+            file_object = open(f'{evaluation_log_path}/{model_name}.txt', 'a')
             file_object.write(f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
 
@@ -154,5 +161,5 @@ class Model(object):
     def extract_evaluation(evaluation: List):
         evaluation_text = ""
         for eval_line in evaluation:
-            evaluation_text += eval_line+"\n"
+            evaluation_text += eval_line + "\n"
         return evaluation_text
