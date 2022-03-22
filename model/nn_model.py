@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow import keras
 import datetime
 from typing import List
+import os
 
 
 class NNModel(Model):
@@ -16,19 +17,25 @@ class NNModel(Model):
                     output_file_name: str,
                     output_file_extension: str = "h5",
                     save_file: bool = False,
+                    model_path=None,
+                    batch_size=20,
                     epochs=10):
         print('Started training model ...')
         # Tensorboard
         logdir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
         tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
-
+        print(self.x_train.shape)
+        print(self.y_train.shape)
         # Train model
-        self.model.fit(self.x_train, self.y_train, epochs=epochs, callbacks=[tensorboard_callback])
+        self.model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, callbacks=[tensorboard_callback])
         print('Done training...')
 
         # Saving file
         if save_file:
-            self.save_model(f"generated_models/{output_file_name}", extension=output_file_extension)
+            generated_model_path = 'generated_models' if not model_path else f'generated_models/{model_path}'
+            if not os.path.exists(generated_model_path):
+                os.makedirs(generated_model_path)
+            self.save_model(f"{generated_model_path}/{output_file_name}", extension=output_file_extension)
 
     def save_model(self, output_file_name: str, extension: str = "h5"):
         self.model.save(f"{output_file_name}.{extension}")

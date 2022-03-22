@@ -13,6 +13,7 @@ class SVRModel(Model):
                     output_file_name: str,
                     output_file_extension: str = "sav",
                     save_file: bool = False,
+                    batch_size=20,
                     epochs=10):
         # Train model
         self.model.fit(self.x_train, self.y_train)

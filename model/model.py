@@ -60,6 +60,7 @@ class Model(object):
                     output_file_name: str,
                     output_file_extension: str = "h5",
                     save_file: bool = False,
+                    batch_size=20,
                     epochs=10):
         pass
 
@@ -106,7 +107,7 @@ class Model(object):
                        largest_classification_value=10,
                        plot_classification_data=False,
                        log_evaluation=True,
-                       log_path = None):
+                       log_path=None):
         print("Evaluating model ...")
         evaluation = []
 
@@ -146,6 +147,9 @@ class Model(object):
         # Log evaluation
         if log_evaluation:
             evaluation_log_path = 'evaluation_logs' if not log_path else f'evaluation_logs/{log_path}'
+            if not os.path.exists(evaluation_log_path):
+                os.makedirs(evaluation_log_path)
+
             file_object = open(f'{evaluation_log_path}/{model_name}.txt', 'a')
             file_object.write(f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
