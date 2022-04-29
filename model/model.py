@@ -150,7 +150,7 @@ class Model(object):
             if not os.path.exists(evaluation_log_path):
                 os.makedirs(evaluation_log_path)
 
-            file_object = open(f'{evaluation_log_path}/{model_name}.txt', 'a')
+            file_object = open(f'{model_name}.txt', 'a')
             file_object.write(f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
 

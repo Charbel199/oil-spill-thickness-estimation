@@ -35,7 +35,7 @@ class NNModel(Model):
             generated_model_path = 'generated_models' if not model_path else f'generated_models/{model_path}'
             if not os.path.exists(generated_model_path):
                 os.makedirs(generated_model_path)
-            self.save_model(f"{generated_model_path}/{output_file_name}", extension=output_file_extension)
+            self.save_model(f"{output_file_name}", extension=output_file_extension)
 
     def save_model(self, output_file_name: str, extension: str = "h5"):
         self.model.save(f"{output_file_name}.{extension}")

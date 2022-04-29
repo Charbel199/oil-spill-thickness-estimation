@@ -22,7 +22,7 @@ loader.load_data_from_file(
     file_name=f"generated_data/{file_name}",
     file_format="{}-{}.txt",
     possible_output_values=[(7, 7, 1)],
-    max_number_of_rows=40000)
+    max_number_of_rows=4000)
 
 model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True)
 model.load_model_data(test_size=0.9, is_classification_problem=False, normalize_output=False)
