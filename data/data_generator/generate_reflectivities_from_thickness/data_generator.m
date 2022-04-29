@@ -5,27 +5,38 @@
 clear all
 
 % Parameters
+% -----------------------------------------------------------------------
 %f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
 f= [4.3855 6.9759 9.0681 11]*1e9;
-ks=[0 0 0 0]; 
+
 loss = exp(-4.*(ks*cosd(0)).^2);
-%s=0.3e-2;
-%ks= (2*pi./lambda).*s
 thickness= [1:1:10]; % in mm
 c = 3e8; % speed of light
 lambda= c./f; % EM wavelength
+%s=0.3e-2;
+%ks= (2*pi./lambda).*s
+ks=[0 0 0 0];
 
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
 [epsr_w, epsi_w] = module4_2(temperature_w,f/1e9,salinity_w);
 eps1 = 1; % dielectric permittivity of medium 1, air
 eps3 = epsr_w-epsi_w*1i; % dielectric permittivity of medium 3, saline water
-for eps2= [3]
+permittivity_range = [3]
+variance_noise= 0.001;
+% -----------------------------------------------------------------------
+
+
+
+
+% Reflectivity generation
+% -----------------------------------------------------------------------
+for eps2= permittivity_range
     n1 = sqrt(eps1);
     n2= sqrt(eps2);
     n3= sqrt(eps3);
 
-    variance_noise= 0.001;
+
     file_name = "thickness-4freqs-variance0.001-";
 
     r = zeros(length(lambda),length(thickness));
@@ -50,3 +61,4 @@ for eps2= [3]
         export_to_file(reflectivities_with_noise, file_name, size(R(:,s),1), thickness(s));
     end
 end
+% -----------------------------------------------------------------------
