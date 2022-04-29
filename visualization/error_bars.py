@@ -1,8 +1,8 @@
 import numpy as np;
 from typing import List, Dict
+import matplotlib.pyplot as plt
 
 np.random.seed(42)
-import matplotlib.pyplot as plt
 
 
 def plot_error_bars(x, y, y_error,
