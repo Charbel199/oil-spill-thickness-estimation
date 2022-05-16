@@ -2,7 +2,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.txt
+
 # C extensions
 *.so
 .idea
@@ -15,7 +15,7 @@ downloads/
 eggs/
 .eggs/
 lib/
-lib64/
+lib64/1_hidden_layer
 parts/
 sdist/
 var/
@@ -130,3 +130,4 @@ dmypy.json
 generated_models/
 evaluation_logs/
 logs/
+*.h5
