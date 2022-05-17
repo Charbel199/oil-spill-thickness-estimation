@@ -37,7 +37,7 @@ for i in range(2, 15):
         nn_layers_text += str(layer[1]) + '-'
 
     print(f"Training model with layers: {network_layers}")
-    model_name = f'compare-nn-v{i}-1output-thickness-architecture-{nn_layers_text}9freqs-variance0.001-{max_number_of_rows}'
+    model_name = f'compare-nn-1output-thickness-architecture-{nn_layers_text}4freqs-variance0.001-{max_number_of_rows}'
     # Training and evaluation
     model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True, metrics="mean_absolute_error")
     model.load_model_data(test_size=0.2, is_classification_problem=False, normalize_output=False)

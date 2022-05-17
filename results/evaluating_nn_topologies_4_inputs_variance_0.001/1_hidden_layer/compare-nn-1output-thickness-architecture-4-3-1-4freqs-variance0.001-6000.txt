@@ -1,0 +1,12 @@
+
+compare-nn-1output-thickness-architecture-4-3-1-4freqs-variance0.001-6000
+Neural Network: 
+[['Input', 4], ['Dense', 3, 'relu'], ['Dense', 1, 'linear']]
+optimizer=Adam
+learning rate=0.001
+loss=mean_squared_error
+metrics=mean_absolute_error
+R2 score: -2.5966961035184255e-05
+MSE: 8.26084999665553
+ 
+=====================================
