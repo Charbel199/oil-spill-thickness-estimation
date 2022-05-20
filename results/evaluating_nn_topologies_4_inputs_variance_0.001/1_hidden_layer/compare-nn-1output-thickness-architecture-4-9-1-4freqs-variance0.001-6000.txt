@@ -7,6 +7,6 @@ learning rate=0.001
 loss=mean_squared_error
 metrics=mean_absolute_error
 R2 score: 0.9892128648193609
-MSE: 0.0891085917415758
+MSE: 0.1091085917415758
  
 =====================================
