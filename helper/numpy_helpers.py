@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def save_array(arr, name):
+def save_np(arr, name):
     np.save(f'{name}.npy', arr)  # save
 
 
