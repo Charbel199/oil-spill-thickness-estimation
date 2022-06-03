@@ -2,7 +2,7 @@ from data.data_loader import DataLoader
 from model.nn_model import NNModel
 from visualization import error_bars, points_cloud
 from visualization import environment_oil_thickness_distribution as e
-
+from visualization.environments import generate_circle_environment
 # Initial parameters
 file_name = 'thickness-9freqs-variance0.001-'
 model_name = 'new-WITHOUT0-nn-v13-2outputs-thickness-9freqs-variance0.001-10000'
@@ -50,7 +50,7 @@ predicted_values = model.y_pred[:, 0]
 error_bars.generate_error_bars(observed_values, predicted_values, "Observed permittivity", "Predicted permittivity", save_fig=save_figs, output_file_name="PermittivityErrorBars")
 
 # Circle visualization
-env = e.get_circle_thickness_distribution(size=200, smallest_thickness=1, step_size=1)
+env = generate_circle_environment(size=200, smallest_thickness=1, step_size=1)
 e.visualize_environment(env)
 # populated_env_permittivity = e.fill_environment_with_reflectivity_data_2_outputs(env, data_loader=loader, model=model, is_multi_output=True, selected_permittivity=selected_permittivity)
 # print(np.average(populated_env_permittivity))

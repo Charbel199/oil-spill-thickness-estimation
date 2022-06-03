@@ -51,3 +51,29 @@ def generate_fractal_environment(smallest_thickness=1, largest_thickness=10, to_
     return env
 
 
+def generate_circle_environment(
+        size: int = 500,
+        radius_step_size: float = 4 / 100,
+        smallest_thickness: int = 0,
+        largest_thickness: int = 10,
+        step_size: float = 1,
+) -> np.ndarray:
+    def fill_circle(circle_environment, circle_thickness, circle_radius, circle_center):
+        for x in range(len(circle_environment)):
+            for y in range(len(circle_environment[0])):
+                # 2D Circle formula
+                if ((x - circle_center) ** 2 + (y - circle_center) ** 2) < (circle_radius ** 2):
+                    circle_environment[x][y] = circle_thickness
+        return circle_environment
+
+    if smallest_thickness == 1:
+        environment = np.ones(shape=(size, size))
+    else:
+        environment = np.zeros(shape=(size, size))
+    center = int(len(environment) / 2)
+    radius = center
+
+    for thickness in np.arange(smallest_thickness, largest_thickness + step_size, step_size):
+        environment = fill_circle(environment, thickness, radius, center)
+        radius -= int(radius_step_size * size)
+    return environment

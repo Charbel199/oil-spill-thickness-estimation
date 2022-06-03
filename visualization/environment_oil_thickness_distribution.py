@@ -5,35 +5,6 @@ import random
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
-def get_circle_thickness_distribution(
-        size: int = 500,
-        radius_step_size: float = 4 / 100,
-        smallest_thickness: int = 0,
-        largest_thickness: int = 10,
-        step_size: float = 1,
-) -> np.ndarray:
-    def fill_circle(circle_environment, circle_thickness, circle_radius, circle_center):
-        for x in range(len(circle_environment)):
-            for y in range(len(circle_environment[0])):
-                # 2D Circle formula
-                if ((x - circle_center) ** 2 + (y - circle_center) ** 2) < (circle_radius ** 2):
-                    circle_environment[x][y] = circle_thickness
-        return circle_environment
-
-    if smallest_thickness == 1:
-        environment = np.ones(shape=(size, size))
-    else:
-        environment = np.zeros(shape=(size, size))
-    center = int(len(environment) / 2)
-    radius = center
-
-    for thickness in np.arange(smallest_thickness, largest_thickness + step_size, step_size):
-        environment = fill_circle(environment, thickness, radius, center)
-        radius -= int(radius_step_size * size)
-    print("Filled circle")
-    return environment
-
-
 def fill_environment_with_reflectivity_data(
         environment: np.ndarray,
         data_loader: DataLoader
@@ -45,7 +16,7 @@ def fill_environment_with_reflectivity_data(
             thickness = environment[x][y]
             thickness_index = np.where(data_loader.all_data_y == thickness)[0]
             # Get thickness index
-            random_data_point_index = random.randint(0, len(data_loader.all_data_x[thickness_index]))
+            random_data_point_index = random.randint(0, len(data_loader.all_data_x[thickness_index]) - 1)
             ref = data_loader.all_data_x[thickness_index][random_data_point_index]
             temp_populated_environment.append(ref)
 
@@ -59,8 +30,8 @@ def fill_environment_with_reflectivity_data_2_outputs(
         environment: np.ndarray,
         data_loader: DataLoader,
         model,
-        permittivity_index = 0,
-        thickness_index = 1,
+        permittivity_index=0,
+        thickness_index=1,
         selected_permittivity=3.3,
         is_multi_output=False,
         is_thickness=False
