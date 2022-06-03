@@ -27,7 +27,7 @@ def _generate_perlin_noise_2d(shape, res):
     return np.sqrt(2) * ((1 - t[:, :, 1]) * n0 + t[:, :, 1] * n1)
 
 
-def _generate_fractal_noise_2d(shape, res, octaves=1, persistence=0.5):
+def _generate_fractal_noise_2d(shape, res, octaves=1, persistence=0.5) -> np.ndarray:
     noise = np.zeros(shape)
     frequency = 1
     amplitude = 1
@@ -45,9 +45,9 @@ def generate_fractal_environment(smallest_thickness=1, largest_thickness=10, to_
                                      octaves=octaves,
                                      persistence=persistence)
 
-    env = np.interp(n, (env.min(), env.max()), (smallest_thickness, largest_thickness))
+    env = np.interp(env, (env.min(), env.max()), (smallest_thickness, largest_thickness))
     if to_int:
-        env = env.astype(int)
+        env = env.astype('uint8')
     return env
 
 
