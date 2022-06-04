@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from data.data_loader import DataLoader
 import random
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-
+from visualization.environments import generate_circle_environment
 
 def fill_environment_with_reflectivity_data(
         environment: np.ndarray,
@@ -68,7 +68,7 @@ def fill_environment_with_reflectivity_data_2_outputs(
 
 def visualize_environment(
         environment: np.ndarray,
-        output_file_name: str = 'test',
+        output_file_name: str = 'run_test',
         file_type: str = 'svg',
         fig_size: int = 25,
         font_size: int = 25,
@@ -94,7 +94,7 @@ def visualize_environment(
 def compare_two_environments(
         environment: np.ndarray,
         populated_environment: np.ndarray,
-        output_file_name: str = 'test',
+        output_file_name: str = 'run_test',
         file_type: str = 'svg',
         fig_size_width: int = 25,
         fig_size_height: int = 20,
@@ -134,7 +134,7 @@ def compare_three_environments(
         environment1: np.ndarray,
         environment2: np.ndarray,
         environment3: np.ndarray,
-        output_file_name: str = 'test',
+        output_file_name: str = 'run_test',
         file_type: str = 'svg',
         fig_size_width: int = 25,
         fig_size_height: int = 20,
@@ -182,6 +182,6 @@ def compare_three_environments(
 
 
 if __name__ == "__main__":
-    env = get_circle_thickness_distribution()
+    env = generate_circle_environment()
     visualize_environment(env)
     compare_two_environments(env, env)
