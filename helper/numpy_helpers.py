@@ -1,10 +1,4 @@
 import numpy as np
-from PIL import Image
-
-
-def save_np_as_immage(arr, name) -> None:
-    im = Image.fromarray(arr)
-    im.save(f'{name}.jpeg')
 
 
 def save_np(arr, name):
