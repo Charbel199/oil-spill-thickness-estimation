@@ -46,20 +46,17 @@ network_layers = [
 #                       show_fig=True)
 
 
-for i in range(20):
+for i in range(200):
     env = generate_fractal_environment(shape=(100, 100), res=(2, 2), octaves=1)
     reflect_env = fill_environment_with_reflectivity_data(environment=env, data_loader=loader)
-    save_np(reflect_env, f'../generated_data/fractals/validation/x{i}')
-    save_np(env, f'../generated_data/fractals/validation/y{i}')
+    save_np(reflect_env, f'../generated_data/fractals/x{i}')
+    save_np(env, f'../generated_data/fractals/y{i}')
     visualize_environment(environment=env,
-                          output_file_name=f'../generated_data/fractals/validation/y{i}',
+                          output_file_name=f'../generated_data/fractals/y{i}',
                           save_fig=True,
                           show_fig=False,
                           file_type='jpeg')
-
-
-
-
+    print(f"Saved image {i}")
 
 # model_name = 'compare-nn-1output-thickness-architecture-4-5-6-6-1-4freqs-variance0.001-6000'
 # model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True)
