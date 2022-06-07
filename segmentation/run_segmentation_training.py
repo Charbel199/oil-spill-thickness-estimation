@@ -20,7 +20,11 @@ LOAD_MODEL = False
 TRAIN_IMG_DIR = "../generated_data/fractals/"
 VAL_IMG_DIR = "../generated_data/fractals/validation"
 NUM_OF_CLASSES = 11
+SAVE = False
+LOAD = True
+MODEL_PATH = './unet.pkl'
 
+model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
 train_transform = A.Compose(
     [
         A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
@@ -48,7 +52,6 @@ val_transforms = A.Compose(
     ],
 )
 
-model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
@@ -62,21 +65,33 @@ train_loader, val_loader = get_loaders(
     PIN_MEMORY,
 )
 
-if LOAD_MODEL:
-    load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
+if not LOAD:
 
-model.check_accuracy(val_loader, device=DEVICE)
+    if LOAD_MODEL:
+        load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
 
-for epoch in range(NUM_EPOCHS):
-    model.train_fn(train_loader, optimizer, loss_fn)
+    model.check_accuracy(val_loader, device=DEVICE)
 
-    # save model
-    checkpoint = {
-        "state_dict": model.state_dict(),
-        "optimizer": optimizer.state_dict(),
-    }
-    save_checkpoint(checkpoint)
+    for epoch in range(NUM_EPOCHS):
+        model.train_fn(train_loader, optimizer, loss_fn)
 
+        # save model
+        checkpoint = {
+            "state_dict": model.state_dict(),
+            "optimizer": optimizer.state_dict(),
+        }
+        save_checkpoint(checkpoint)
+
+        # check accuracy
+        model.check_accuracy(val_loader, device=DEVICE)
+
+        # print some examples to a folder
+        model.save_predictions_as_images(
+            val_loader, folder="./generated_data", device=DEVICE
+        )
+else:
+    model = torch.load(MODEL_PATH)
+    model.eval()
     # check accuracy
     model.check_accuracy(val_loader, device=DEVICE)
 
@@ -84,3 +99,6 @@ for epoch in range(NUM_EPOCHS):
     model.save_predictions_as_images(
         val_loader, folder="./generated_data", device=DEVICE
     )
+
+if SAVE:
+    torch.save(model, MODEL_PATH)
