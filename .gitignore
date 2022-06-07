@@ -133,3 +133,4 @@ logs/
 *.h5
 generated_data/
 *.tar
+*.pkl
