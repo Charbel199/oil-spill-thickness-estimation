@@ -1,0 +1,17 @@
+version: '2.3'
+
+services:
+
+  oil-spill-evaluation:
+    image: oil-spill-evaluation:latest
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    networks:
+      - oil-spill-evaluation-network
+    volumes:
+      - ./src:/app/src
+    restart: always
+
+networks:
+  oil-spill-evaluation-network:
