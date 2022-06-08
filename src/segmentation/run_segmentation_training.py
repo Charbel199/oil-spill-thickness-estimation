@@ -7,7 +7,8 @@ from segmentation.oil_environment_dataset import get_loaders
 from helper.torch_helpers import load_checkpoint, save_checkpoint
 from model.unet_model import UNET
 
-# Hyperparameters etc.
+# Parameters
+# ==================================================================================================================
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
 BATCH_SIZE = 2
@@ -23,6 +24,7 @@ NUM_OF_CLASSES = 11
 SAVE = False
 LOAD = True
 MODEL_PATH = 'unet.pkl'
+# ==================================================================================================================
 
 model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
 train_transform = A.Compose(
