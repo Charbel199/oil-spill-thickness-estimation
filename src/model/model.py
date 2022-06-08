@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn import metrics as skmetrics
-from data.data_loader import DataLoader
+from src.data.data_loader import DataLoader
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plot

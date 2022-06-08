@@ -72,9 +72,6 @@ for i in range(5, 9):
             mse_values.append(mean_squared_error(model.y_test, model.y_pred))
             number_of_layers.append(len(network_layers) - 2)
 
-import matplotlib.pyplot as plt
-import numpy as np
-
 # plt.grid()
 # plt.plot(number_of_neurons, mse_values, '-x')
 # plt.xlabel("Number of neurons")

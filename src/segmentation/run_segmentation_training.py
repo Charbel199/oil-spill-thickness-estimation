@@ -17,12 +17,12 @@ IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL = False
-TRAIN_IMG_DIR = "../generated_data/fractals/"
-VAL_IMG_DIR = "../generated_data/fractals/validation"
+TRAIN_IMG_DIR = "../assets/generated_data/fractals/"
+VAL_IMG_DIR = "../assets/generated_data/fractals/validation"
 NUM_OF_CLASSES = 11
 SAVE = False
 LOAD = True
-MODEL_PATH = './unet.pkl'
+MODEL_PATH = 'unet.pkl'
 
 model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
 train_transform = A.Compose(
