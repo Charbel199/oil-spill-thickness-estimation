@@ -127,9 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-generated_models/
-evaluation_logs/
-logs/
+assets/generated_models/
+assets/evaluation_logs/
+assets/logs/
 *.h5
 generated_data/
 *.tar
