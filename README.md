@@ -6,8 +6,9 @@ For proper assessment of an oil spill scenario, thickness measurements need to r
 
 ## Machine learning models
 For now, two main machine learning models are being tested:<br>
-&emsp; **[SVR](model/svr_model.py)**<br>
-&emsp; **[Neural Networks](model/nn_model.py)**<br>
+&emsp; **[SVR](src/model/svr_model.py)**<br>
+&emsp; **[Neural Networks](src/model/nn_model.py)**<br>
+&emsp; **[Segmentation CNN models](src/model/unet_model.py)**<br>
 
 SVRs are quite simple but very inefficient when it comes to many input features and a large amount of training data.
 <br>
@@ -18,9 +19,9 @@ would be installed on a drone.
 
 ## Data
 We are generating training data from MATLAB simulations.
-To generate the needed data, the **[data generator](data/data_generator/generate_reflectivities_from_thickness/data_generator.m)** module is used.
-It utilizes the **[relative dielectric constant](data/data_generator/generate_reflectivities_from_thickness/module4_2.m)** module along with the **[noise](data/data_generator/generate_reflectivities_from_thickness/noise.m)** 
-and the **[export to file](data/data_generator/generate_reflectivities_from_thickness/export_to_file.m)** modules.
+To generate the needed data, the **[data generator](src/data/data_generator/generate_reflectivities_from_thickness/data_generator.m)** module is used.
+It utilizes the **[relative dielectric constant](src/data/data_generator/generate_reflectivities_from_thickness/module4_2.m)** module along with the **[noise](src/data/data_generator/generate_reflectivities_from_thickness/noise.m)** 
+and the **[export to file](src/data/data_generator/generate_reflectivities_from_thickness/export_to_file.m)** modules.
 
 
 
