@@ -1,5 +1,3 @@
-import numpy as np
-
 from visualization.environment_oil_thickness_distribution import fill_environment_with_reflectivity_data, \
     visualize_environment
 from visualization.environments import generate_fractal_environment
