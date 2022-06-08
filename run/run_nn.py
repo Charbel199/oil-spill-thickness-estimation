@@ -3,9 +3,12 @@ from model.nn_model import NNModel
 from visualization import error_bars, points_cloud
 from visualization import environment_oil_thickness_distribution as e
 from visualization.environments import generate_circle_environment
-# Initial parameters
-file_name = 'thickness-9freqs-variance0.001-'
-model_name = 'new-WITHOUT0-nn-v13-2outputs-thickness-9freqs-variance0.001-10000'
+
+# Parameters
+# ==================================================================================================================
+FILE_NAME = 'thickness-9freqs-variance0.001-'
+MODEL_NAME = 'new-WITHOUT0-nn-v13-2outputs-thickness-9freqs-variance0.001-10000'
+NEW_MODEL = True
 network_layers = [
     ["Input", 9],
     ["Dense", 12, "relu"],
@@ -13,12 +16,13 @@ network_layers = [
     ["Dense", 12, "relu"],
     ["Dense", 2, "linear"]
 ]
-new_model = True
+# ==================================================================================================================
+
 
 # Data
 loader = DataLoader()
 loader.load_data_from_file(
-    file_name=f"generated_data/{file_name}",
+    file_name=f"generated_data/{FILE_NAME}",
     file_format="{}permittivity{}-{}.txt",
     possible_output_values=[(2.8, 3.3, 0.1), (1, 10, 1)],
     max_number_of_rows=10000)
@@ -26,11 +30,11 @@ loader.load_data_from_file(
 # Training and evaluation
 model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True)
 model.load_model_data(test_size=0.2, is_classification_problem=False, normalize_output=False)
-if new_model:
-    model.train_model(output_file_name=model_name, save_file=True, epochs=5)
+if NEW_MODEL:
+    model.train_model(output_file_name=MODEL_NAME, save_file=True, epochs=5)
 else:
-    model.load_model(f"generated_models/{model_name}")
-model.evaluate_model(model_name=model_name, log_evaluation=True, include_classification_metrics=False)
+    model.load_model(f"generated_models/{MODEL_NAME}")
+model.evaluate_model(model_name=MODEL_NAME, log_evaluation=True, include_classification_metrics=False)
 # size_to_view = 40
 # y_pred = model.predict(model.x_test[0:size_to_view])
 # for i in range(len(y_pred)):

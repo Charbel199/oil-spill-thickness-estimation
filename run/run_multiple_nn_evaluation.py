@@ -1,9 +1,15 @@
 from data.data_loader import DataLoader
 from model.nn_model import NNModel
-from visualization import points_cloud, error_bars
 from sklearn.metrics import mean_squared_error
 
-file_name = 'thickness-4freqs-variance0.001'
+# Parameters
+# ==================================================================================================================
+DATA_FILE_NAME = 'thickness-4freqs-variance0.001'
+NEW_MODEL = False
+NUMBER_OF_HIDDEN_LAYERS = 1
+MINIMUM_NUMBER_OF_NEURONS_PER_LAYER = 2
+MAXIMUM_NUMBER_OF_NEURONS_PER_LAYER = 15
+
 network_layers = [
     ["Input", 4],
     ["Dense", 1, "relu"],
@@ -11,18 +17,18 @@ network_layers = [
     ["Dense", 1, "relu"],
     ["Dense", 1, "linear"]
 ]
-new_model = False
+# ==================================================================================================================
 
 # Data
 loader = DataLoader()
-max_number_of_rows = 6000
+max_number_of_rows = 10000
 loader.load_data_from_file(
-    file_name=f"generated_data/{file_name}",
+    file_name=f"generated_data/{DATA_FILE_NAME}",
     file_format="{}-{}.txt",
     possible_output_values=[(1, 10, 1)],
     max_number_of_rows=max_number_of_rows)
-print(loader.all_data_x.shape)
-print(loader.all_data_y.shape)
+
+
 mse_values = []
 number_of_neurons = []
 number_of_neurons_layer_1 = []
@@ -65,11 +71,6 @@ for i in range(5, 9):
             number_of_neurons_layer_3.append(network_layers[3][1])
             mse_values.append(mean_squared_error(model.y_test, model.y_pred))
             number_of_layers.append(len(network_layers) - 2)
-            # save_figs = False
-            # observed_values = model.y_test[:, 0]
-            # predicted_values = model.y_pred[:, 0]
-            # points_cloud.plot_cloud(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessCloud")
-            # error_bars.generate_error_bars(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessErrorBars")
 
 import matplotlib.pyplot as plt
 import numpy as np
