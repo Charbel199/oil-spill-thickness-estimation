@@ -39,7 +39,7 @@ possible_hidden_layers_architectures = list(
 if os.path.exists(RESULTS_FILE_PATH):
     results = pd.read_csv(RESULTS_FILE_PATH)
 else:
-    results = pd.DataFrame(columns=['layers', 'loss', 'std_dev'])
+    results = pd.DataFrame(columns=['layers', 'mse', 'std_dev', "r2", "mae", "loss_per_fold"])
 
 for hidden_layers_architecture in possible_hidden_layers_architectures:
     network_layers = base_network_layers[1:].copy()
@@ -61,15 +61,15 @@ for hidden_layers_architecture in possible_hidden_layers_architectures:
     model_name = f'assets/comparing_nn_topologies/nn-{network_layers_text}-4freqs-variance0.001-{max_number_of_rows}'
     # Training and evaluation
     model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error',
-                    print_summary=True, metrics="mean_squared_error")
+                    print_summary=True, metrics="mean_absolute_error")
     model.load_model_data(test_size=0.2, is_classification_problem=False, normalize_output=False, num_of_folds=10)
 
-    if not model.check_if_model_exists(f"/{model_name}.h5"):
-        metrics = model.train_model_kfold_cross_validation(
-            batch_size=64,
-            output_file_name=f"assets/generated_models/comparison/{model_name}",
-            epochs=3)
-        metrics["layers"] = network_layers_text
+    # if not model.check_if_model_exists(f"/{model_name}.h5"):
+    metrics = model.train_model_kfold_cross_validation(
+        batch_size=64,
+        output_file_name=f"assets/generated_models/comparison/{model_name}",
+        epochs=3)
+    metrics["layers"] = network_layers_text
 
     results = results.append(metrics, ignore_index=True)
     results.to_csv(f'{RESULTS_FILE_PATH}')

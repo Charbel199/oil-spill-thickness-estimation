@@ -6,6 +6,7 @@ import datetime
 from typing import List
 import os
 import numpy as np
+from sklearn.metrics import r2_score
 
 
 class NNModel(Model):
@@ -45,6 +46,8 @@ class NNModel(Model):
                                            epochs=10):
 
         loss_per_fold = []
+        mae_per_fold = []
+        r2_per_fold = []
         fold_no = 1
         self.print_summary = False
         for train, test in self.kfold_indices:
@@ -56,16 +59,23 @@ class NNModel(Model):
             # Generate generalization metrics
             scores = self.model.evaluate(self.data_loader.all_data_x[test], self.data_loader.all_data_y[test],
                                          verbose=0)
+            y_pred = self.model.predict(self.data_loader.all_data_x[test])
+            r2 = r2_score(self.data_loader.all_data_y[test], y_pred)
+
             print(
                 f'Score for fold {fold_no}: {self.model.metrics_names[0]} of {scores[0]}; {self.model.metrics_names[1]} of {scores[1]}')
             loss_per_fold.append(scores[0])
-
+            mae_per_fold.append(scores[1])
+            r2_per_fold.append(r2)
             # Increase fold number
             fold_no = fold_no + 1
         # == Provide average scores ==
         metrics = {
-            "loss": np.mean(loss_per_fold),
+            "mse": np.mean(loss_per_fold),
             "std_dev": np.std(loss_per_fold),
+            "r2": np.mean(r2_per_fold),
+            "mae": np.mean(mae_per_fold),
+            "loss_per_fold": loss_per_fold
         }
 
         print('------------------------------------------------------------------------')
