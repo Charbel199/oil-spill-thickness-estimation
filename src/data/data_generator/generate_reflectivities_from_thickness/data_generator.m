@@ -7,15 +7,15 @@ clear all
 % Parameters
 % -----------------------------------------------------------------------
 %f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
-f= [4.3855 6.9759 9.0681 11]*1e9;
-
+f= [4.3855 6.9759 9.0681 11]*1e9
+ks=[0 0 0 0];
 loss = exp(-4.*(ks*cosd(0)).^2);
 thickness= [1:1:10]; % in mm
 c = 3e8; % speed of light
 lambda= c./f; % EM wavelength
 %s=0.3e-2;
 %ks= (2*pi./lambda).*s
-ks=[0 0 0 0];
+
 
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
