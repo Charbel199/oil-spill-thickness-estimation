@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn import metrics as skmetrics
-from src.data.data_loader import DataLoader
+from data.data_loader import DataLoader
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plot
@@ -9,6 +9,7 @@ from sklearn import preprocessing
 from abc import abstractmethod
 from typing import List
 import os
+from sklearn.model_selection import KFold
 
 
 class Model(object):
@@ -18,12 +19,14 @@ class Model(object):
         self.x_train, self.x_test, self.y_train, self.y_test = None, None, None, None
         self.data_loader = data_loader
         self.model = None
+        self.kfold_indices = None
 
     def load_model_data(self,
                         test_size=0.2,
                         random_state=42,
                         is_classification_problem=True,
                         number_of_classes=10,
+                        num_of_folds=2,
                         normalize_output=False,
                         normalize_input=False,
                         normalize_range=None
@@ -49,6 +52,8 @@ class Model(object):
         if is_classification_problem:
             self.data_loader.all_data_y = self.preprocess_y_data(self.data_loader.all_data_y, number_of_classes)
 
+        kfold = KFold(n_splits=num_of_folds, shuffle=True, random_state=random_state)
+        self.kfold_indices = kfold.split(self.data_loader.all_data_x, self.data_loader.all_data_y)
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.data_loader.all_data_x,
                                                                                 self.data_loader.all_data_y,
                                                                                 test_size=test_size,
@@ -62,6 +67,13 @@ class Model(object):
                     save_file: bool = False,
                     batch_size=20,
                     epochs=10):
+        pass
+
+    @abstractmethod
+    def train_model_kfold_cross_validation(self,
+                                           output_file_name: str,
+                                           batch_size=20,
+                                           epochs=10):
         pass
 
     @abstractmethod
@@ -130,7 +142,9 @@ class Model(object):
             y_pred_classification = list(map(self._get_max_index, self.y_pred))
             y_test_classification = list(map(self._get_max_index, self.y_test))
             # Rounding to maximum classification value
-            y_pred_classification = [round(pred) if pred <= largest_classification_value else largest_classification_value for pred in y_pred_classification]
+            y_pred_classification = [
+                round(pred) if pred <= largest_classification_value else largest_classification_value for pred in
+                y_pred_classification]
             # Classification metrics
             classification_report = skmetrics.classification_report(y_test_classification, y_pred_classification)
             classification_confusion_matrix = confusion_matrix(y_test_classification, y_pred_classification)
@@ -151,7 +165,8 @@ class Model(object):
             #     os.makedirs(evaluation_log_path)
 
             file_object = open(f'{evaluation_log_path}/{model_name}.txt', 'a')
-            file_object.write(f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
+            file_object.write(
+                f"\n{model_name}\n{self.extract_evaluation(evaluation)} \n=====================================\n")
             file_object.close()
 
         print(f"Evaluation:\n{self.extract_evaluation(evaluation)}")

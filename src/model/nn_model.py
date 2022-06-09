@@ -5,6 +5,7 @@ from tensorflow import keras
 import datetime
 from typing import List
 import os
+import numpy as np
 
 
 class NNModel(Model):
@@ -27,7 +28,8 @@ class NNModel(Model):
         print(self.x_train.shape)
         print(self.y_train.shape)
         # Train model
-        self.model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size, callbacks=[tensorboard_callback])
+        self.model.fit(self.x_train, self.y_train, epochs=epochs, batch_size=batch_size,
+                       callbacks=[tensorboard_callback])
         print('Done training...')
 
         # Saving file
@@ -36,6 +38,46 @@ class NNModel(Model):
             if not os.path.exists(generated_model_path):
                 os.makedirs(generated_model_path)
             self.save_model(f"{output_file_name}", extension=output_file_extension)
+
+    def train_model_kfold_cross_validation(self,
+                                           output_file_name: str,
+                                           batch_size=20,
+                                           epochs=10):
+
+        loss_per_fold = []
+        fold_no = 1
+        self.print_summary = False
+        for train, test in self.kfold_indices:
+            self.model = self.create_neural_network(self.network_layers)
+            history = self.model.fit(self.data_loader.all_data_x[train], self.data_loader.all_data_y[train],
+                                     batch_size=batch_size,
+                                     epochs=epochs)
+
+            # Generate generalization metrics
+            scores = self.model.evaluate(self.data_loader.all_data_x[test], self.data_loader.all_data_y[test],
+                                         verbose=0)
+            print(
+                f'Score for fold {fold_no}: {self.model.metrics_names[0]} of {scores[0]}; {self.model.metrics_names[1]} of {scores[1]}')
+            loss_per_fold.append(scores[0])
+
+            # Increase fold number
+            fold_no = fold_no + 1
+        # == Provide average scores ==
+        metrics = {
+            "loss": np.mean(loss_per_fold),
+            "std_dev": np.std(loss_per_fold),
+        }
+
+        print('------------------------------------------------------------------------')
+        print('Score per fold')
+        for i in range(0, len(loss_per_fold)):
+            print('------------------------------------------------------------------------')
+            print(f'> Fold {i + 1} - Loss: {loss_per_fold[i]}')
+        print('------------------------------------------------------------------------')
+        print('Average scores for all folds:')
+        print(f'> Loss: {np.mean(loss_per_fold)}')
+        print('------------------------------------------------------------------------')
+        return metrics
 
     def save_model(self, output_file_name: str, extension: str = "h5"):
         self.model.save(f"{output_file_name}.{extension}")
@@ -56,7 +98,7 @@ class NNModel(Model):
         self.print_summary = kwargs.get('print_summary', True)
 
     def create_neural_network(self, neural_network: List):
-
+        print(f"Created network {neural_network}")
         # Generating nn layers
         nn_layers = []
         for layer in neural_network:
