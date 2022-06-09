@@ -62,11 +62,15 @@ class NNModel(Model):
             y_pred = self.model.predict(self.data_loader.all_data_x[test])
             r2 = r2_score(self.data_loader.all_data_y[test], y_pred)
 
-            print(
-                f'Score for fold {fold_no}: {self.model.metrics_names[0]} of {scores[0]}; {self.model.metrics_names[1]} of {scores[1]}')
             loss_per_fold.append(scores[0])
             mae_per_fold.append(scores[1])
             r2_per_fold.append(r2)
+
+            print(
+                f'> Score for fold {fold_no}: {self.model.metrics_names[0]} of {scores[0]}; {self.model.metrics_names[1]} of {scores[1]}')
+            print(
+                f'> R2: {r2}; Loss per fold: {loss_per_fold}')
+
             # Increase fold number
             fold_no = fold_no + 1
         # == Provide average scores ==
@@ -85,7 +89,7 @@ class NNModel(Model):
             print(f'> Fold {i + 1} - Loss: {loss_per_fold[i]}')
         print('------------------------------------------------------------------------')
         print('Average scores for all folds:')
-        print(f'> Loss: {np.mean(loss_per_fold)}')
+        print(f'{metrics}')
         print('------------------------------------------------------------------------')
         return metrics
 
