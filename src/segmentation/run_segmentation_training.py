@@ -11,19 +11,21 @@ from model.unet_model import UNET
 # ==================================================================================================================
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
-BATCH_SIZE = 2
-NUM_EPOCHS = 3
+BATCH_SIZE = 4
+NUM_EPOCHS = 5
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
-LOAD_MODEL = False
-TRAIN_IMG_DIR = "../assets/generated_data/fractals/"
-VAL_IMG_DIR = "../assets/generated_data/fractals/validation"
+LOAD_MODEL_FROM_CHECKPOINT = False
+MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
+TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals/training"
+VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals/validation"
+PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals/pred"
 NUM_OF_CLASSES = 11
-SAVE = False
-LOAD = True
-MODEL_PATH = 'unet.pkl'
+SAVE = True
+LOAD = False
+MODEL_PATH = 'unet_highvariance.pkl'
 # ==================================================================================================================
 
 model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
@@ -69,8 +71,8 @@ train_loader, val_loader = get_loaders(
 
 if not LOAD:
 
-    if LOAD_MODEL:
-        load_checkpoint(torch.load("my_checkpoint.pth.tar"), model)
+    if LOAD_MODEL_FROM_CHECKPOINT:
+        load_checkpoint(torch.load(MODEL_CHECKPOINT), model)
 
     model.check_accuracy(val_loader, device=DEVICE)
 
@@ -89,7 +91,7 @@ if not LOAD:
 
         # print some examples to a folder
         model.save_predictions_as_images(
-            val_loader, folder="./generated_data", device=DEVICE
+            val_loader, folder=PRED_IMG_DIR, device=DEVICE
         )
 else:
     model = torch.load(MODEL_PATH)
@@ -99,7 +101,7 @@ else:
 
     # print some examples to a folder
     model.save_predictions_as_images(
-        val_loader, folder="./generated_data", device=DEVICE
+        val_loader, folder=PRED_IMG_DIR, device=DEVICE
     )
 
 if SAVE:
