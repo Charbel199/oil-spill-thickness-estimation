@@ -89,6 +89,8 @@ def visualize_environment(
         plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
     if show_fig:
         plt.show()
+    else:
+        plt.close(fig)
 
 
 def compare_two_environments(
@@ -128,6 +130,8 @@ def compare_two_environments(
         plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
     if show_fig:
         plt.show()
+    else:
+        plt.close(fig)
 
 
 def compare_three_environments(
@@ -179,6 +183,8 @@ def compare_three_environments(
         plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
     if show_fig:
         plt.show()
+    else:
+        plt.close(fig)
 
 
 if __name__ == "__main__":
