@@ -94,7 +94,7 @@ def _generate_fractal_noise_2d(
 
 
 def generate_fractal_environment(smallest_thickness=1, largest_thickness=10, to_int=True, shape=(300, 300), res=(2, 2),
-                                 octaves=1, persistence=0.5):
+                                 octaves=1, persistence=0.5) -> np.ndarray:
     env = _generate_fractal_noise_2d(shape=shape,
                                      res=res,
                                      octaves=octaves,
