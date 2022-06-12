@@ -10,13 +10,13 @@ from helper.numpy_helpers import *
 # ==================================================================================================================
 FILE_NAME = 'thickness-4freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/variance_0.02/{FILE_NAME}"
-SHOW_REFLECTIVITIES_PLOTS = False
-RES = (2, 2)
+SHOW_REFLECTIVITIES_PLOTS = True
+RES = (4, 4)
 OCTAVES = 2
-OUTPUT_SHAPE = (100, 100)
+OUTPUT_SHAPE = (200, 200)
 SMALLEST_THICKNESS = 0
 LARGEST_THICKNESS = 10
-NUMBER_OF_DATA_POINTS = 10
+NUMBER_OF_DATA_POINTS = 0
 FOR_TRAINING = False
 IS_CLASSIFICATION = True
 OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02/fractals_with_0_classification/{'training' if FOR_TRAINING else 'validation'}"
@@ -35,7 +35,8 @@ loader.load_data_from_file(
 if SHOW_REFLECTIVITIES_PLOTS:
     env = generate_fractal_environment(smallest_thickness=SMALLEST_THICKNESS, largest_thickness=LARGEST_THICKNESS,
                                        shape=OUTPUT_SHAPE, res=RES, octaves=OCTAVES)
-
+    if IS_CLASSIFICATION:
+        env[env != 0] = 1
     visualize_environment(environment=env,
                           save_fig=False,
                           show_fig=True)
