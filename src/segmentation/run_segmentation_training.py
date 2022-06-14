@@ -3,9 +3,10 @@ from albumentations.pytorch import ToTensorV2
 import torch.nn as nn
 import torch.optim as optim
 import torch
-from segmentation.oil_environment_dataset import get_loaders
+from data.datasets.oil_environment_dataset import get_loaders
 from helper.torch_helpers import load_checkpoint, save_checkpoint
-from model.unet_model import UNET
+# from model.unet_model import UNET
+from model.unet_model_classification import UNETClassifier as UNET
 
 # Parameters
 # ==================================================================================================================
@@ -19,16 +20,16 @@ IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL_FROM_CHECKPOINT = False
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
-TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals/training"
-VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals/validation"
-PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals/pred"
-NUM_OF_CLASSES = 11
-SAVE = True
-LOAD = False
-MODEL_PATH = 'unet_highvariance.pkl'
+TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_classification/training"
+VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_classification/validation"
+PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_classification/pred"
+NUM_OF_CLASSES = 1
+SAVE = False
+LOAD = True
+MODEL_PATH = 'unet_highvariance_with_0_classification.pkl'
 # ==================================================================================================================
 
-model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES).to(DEVICE)
+model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES, normalize_output=True).to(DEVICE)
 train_transform = A.Compose(
     [
         A.Resize(height=IMAGE_HEIGHT, width=IMAGE_WIDTH),
@@ -56,7 +57,7 @@ val_transforms = A.Compose(
     ],
 )
 
-loss_fn = nn.CrossEntropyLoss()
+loss_fn = nn.BCELoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 train_loader, val_loader = get_loaders(

@@ -11,9 +11,9 @@ from helper.numpy_helpers import *
 FILE_NAME = 'thickness-4freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/variance_0.02/{FILE_NAME}"
 SHOW_REFLECTIVITIES_PLOTS = True
-RES = (4, 4)
+RES = (1, 1)
 OCTAVES = 2
-OUTPUT_SHAPE = (200, 200)
+OUTPUT_SHAPE = (100, 100)
 SMALLEST_THICKNESS = 0
 LARGEST_THICKNESS = 10
 NUMBER_OF_DATA_POINTS = 0
