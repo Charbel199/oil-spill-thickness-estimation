@@ -26,7 +26,7 @@ PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_classificati
 NUM_OF_CLASSES = 1
 SAVE = False
 LOAD = True
-MODEL_PATH = 'unet_highvariance_with_0_classification.pkl'
+MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_classification.pkl'
 # ==================================================================================================================
 
 model = UNET(in_channels=4, out_channels=NUM_OF_CLASSES, normalize_output=True).to(DEVICE)
