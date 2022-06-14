@@ -1,5 +1,5 @@
 from data.data_loader import DataLoader
-from model.model import Model
+from model.base_model import Model
 import tensorflow as tf
 from tensorflow import keras
 import datetime
