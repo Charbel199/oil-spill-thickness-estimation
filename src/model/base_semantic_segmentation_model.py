@@ -5,6 +5,7 @@ from visualization.environment_oil_thickness_distribution import visualize_envir
 import torch
 from abc import abstractmethod
 
+
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(DoubleConv, self).__init__()
@@ -21,11 +22,11 @@ class DoubleConv(nn.Module):
         return self.conv(x)
 
 
-class ImageSegmentationModel(nn.Module):
+class SemanticSegmentationModel(nn.Module):
     def __init__(
             self, in_channels=3, out_channels=1, features=[64, 128, 256, 512], normalize_output=False
     ):
-        super(ImageSegmentationModel, self).__init__()
+        super(SemanticSegmentationModel, self).__init__()
         self.normalize_output = normalize_output
         self.ups = nn.ModuleList()
         self.downs = nn.ModuleList()
