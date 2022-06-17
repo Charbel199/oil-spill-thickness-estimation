@@ -3,7 +3,7 @@ from albumentations.pytorch import ToTensorV2
 import torch.nn as nn
 import torch.optim as optim
 import torch
-from data.datasets.oil_environment_dataset import get_loaders
+from data.datasets.oil_environment_dataset import get_loaders, OilEnvironmentDataset
 from helper.torch_helpers import load_checkpoint, save_checkpoint
 # from model.unet_model import UNET
 from model.unet_model_classification import UNETClassifier as UNET
@@ -12,8 +12,8 @@ from model.unet_model_classification import UNETClassifier as UNET
 # ==================================================================================================================
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
-BATCH_SIZE = 4
-NUM_EPOCHS = 5
+BATCH_SIZE = 10
+NUM_EPOCHS = 10
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
@@ -66,6 +66,7 @@ train_loader, val_loader = get_loaders(
     BATCH_SIZE,
     train_transform,
     val_transforms,
+    OilEnvironmentDataset,
     NUM_WORKERS,
     PIN_MEMORY,
 )
