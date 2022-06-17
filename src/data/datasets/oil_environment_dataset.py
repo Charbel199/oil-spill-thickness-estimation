@@ -23,16 +23,34 @@ class OilEnvironmentDataset(Dataset):
         return x, y
 
 
+class OilEnvironmentDatasetClassificationAndEstimation(Dataset):
+    def __init__(self, data_dir, transform=None):
+        self.data_dir = data_dir
+        self.transform = transform
+        self.items = os.listdir(data_dir)
+
+    def __len__(self):
+        return len([item for item in self.items if 'x' in item])
+
+    def __getitem__(self, index):
+        x = torch.from_numpy(load_np(os.path.join(self.data_dir, f"x{index}"))).float()
+        yc = torch.from_numpy(load_np(os.path.join(self.data_dir, f"yc{index}"))).float()
+        ye = torch.from_numpy(load_np(os.path.join(self.data_dir, f"ye{index}"))).long()
+        x = torch.moveaxis(x, -1, 0)
+        return x, yc, ye
+
+
 def get_loaders(
         train_dir,
         val_dir,
         batch_size,
         train_transform,
         val_transform,
+        dataset_class,
         num_workers=4,
         pin_memory=True,
 ):
-    train_ds = OilEnvironmentDataset(
+    train_ds = dataset_class(
         data_dir=train_dir,
         transform=train_transform,
     )
@@ -45,7 +63,7 @@ def get_loaders(
         shuffle=True,
     )
 
-    val_ds = OilEnvironmentDataset(
+    val_ds = dataset_class(
         data_dir=val_dir,
         transform=val_transform,
     )
