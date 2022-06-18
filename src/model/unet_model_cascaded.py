@@ -2,6 +2,7 @@ import torch.nn as nn
 import torch
 from tqdm import tqdm
 from visualization.environment_oil_thickness_distribution import visualize_environment
+from model.base_semantic_segmentation_model import SemanticSegmentationModel
 
 
 class DiceLoss(nn.Module):
@@ -23,11 +24,11 @@ class SemanticSegmentationCascadedModel():
     def __init__(
             self, classifier, estimator
     ):
-        self.classifier = classifier
-        self.estimator = estimator
+        self.classifier: SemanticSegmentationModel = classifier
+        self.estimator: SemanticSegmentationModel = estimator
 
     def train_fn(self, loader, opt_classifier, opt_estimator, opt_all, criterion_classifier, criterion_estimator,
-                 combined_loss = False,device='cpu'):
+                 combined_loss=False, device='cpu'):
         # loop = tqdm(loader)
 
         for batch_idx, (data, classification_targets, estimator_targets) in enumerate(loader):
@@ -69,21 +70,28 @@ class SemanticSegmentationCascadedModel():
         with torch.no_grad():
             for idx, (x, yc, ye) in enumerate(loader):
                 classification = self.classifier(x)
+
                 estimator_input = torch.cat((x, classification), dim=1)
                 estimation = self.estimator(estimator_input)
+
+                # Format classification results
+                classification = self.classifier.process_prediction(classification)
+                # Format estimation results
+                estimation = self.estimator.process_prediction(estimation)
+
                 index = idx * estimation.shape[0]
+
                 for pred in estimation:
-                    pred = torch.nn.functional.softmax(pred, dim=0)
-                    pred = torch.argmax(pred, dim=0)
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
                                           output_file_name=f"{folder}/pred_estimation_{index}", file_type='jpeg')
                     index += 1
+                    print(f"Saved estimation environment {index}")
                 index = idx * classification.shape[0]
                 for pred in classification:
-                    pred = pred.squeeze()
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
                                           output_file_name=f"{folder}/pred_classification_{index}", file_type='jpeg')
                     index += 1
+                    print(f"Saved classification environment {index}")
 
         self.classifier.train()
         self.estimator.train()
