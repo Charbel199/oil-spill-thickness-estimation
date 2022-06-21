@@ -19,8 +19,10 @@ IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE = True
-LOAD = False
+SAVE = False
+LOAD = True
+SAVE_PREDICTION_IMAGES = False
+EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
 TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/training"
 VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/validation"
@@ -82,6 +84,16 @@ train_loader, val_loader = get_loaders(
 criterion_classifier = DiceLoss()
 criterion_estimator = nn.CrossEntropyLoss()
 
+
+def _evaluate_model():
+    if SAVE_PREDICTION_IMAGES:
+        cascaded_model.save_predictions_as_images(
+            val_loader, folder=PRED_IMG_DIR, device=DEVICE
+        )
+    if EVALUATE_METRICS:
+        cascaded_model.evaluate_metrics(val_loader)
+
+
 if not LOAD:
     classifier.train()
     estimator.train()
@@ -92,6 +104,7 @@ if not LOAD:
                                     opt_estimator=opt_estimator,
                                     criterion_estimator=criterion_estimator,
                                     criterion_classifier=criterion_classifier,
+                                    combined_loss=False,
                                     opt_all=opt_all,
                                     device=DEVICE)
 
@@ -102,13 +115,7 @@ if not LOAD:
             # }
             # save_checkpoint(checkpoint)
 
-            # check accuracy
-            # cascaded_model.check_accuracy(val_loader, device=DEVICE)
-
-            # print some examples to a folder
-            cascaded_model.save_predictions_as_images(
-                val_loader, folder=PRED_IMG_DIR, device=DEVICE
-            )
+            _evaluate_model()
 
 
 
@@ -117,13 +124,8 @@ else:
     estimator = torch.load(ESTIMATOR_MODEL_PATH)
     cascaded_model = SemanticSegmentationCascadedModel(classifier=classifier,
                                                        estimator=estimator)
-    # check accuracy
-    # cascaded_model.check_accuracy(val_loader, device=DEVICE)
+    _evaluate_model()
 
-    # print some examples to a folder
-    cascaded_model.save_predictions_as_images(
-        val_loader, folder=PRED_IMG_DIR, device=DEVICE
-    )
 if SAVE:
     torch.save(cascaded_model.classifier, CLASSIFIER_MODEL_PATH)
     torch.save(cascaded_model.estimator, ESTIMATOR_MODEL_PATH)
