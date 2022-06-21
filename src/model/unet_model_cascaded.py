@@ -3,6 +3,7 @@ import torch
 from tqdm import tqdm
 from visualization.environment_oil_thickness_distribution import visualize_environment
 from model.base_semantic_segmentation_model import SemanticSegmentationModel
+from metrics.iou import iou_coefficient
 
 
 class DiceLoss(nn.Module):
@@ -92,6 +93,39 @@ class SemanticSegmentationCascadedModel():
                                           output_file_name=f"{folder}/pred_classification_{index}", file_type='jpeg')
                     index += 1
                     print(f"Saved classification environment {index}")
+
+        self.classifier.train()
+        self.estimator.train()
+
+    def evaluate_metrics(self, loader):
+        self.classifier.eval()
+        self.estimator.eval()
+
+        with torch.no_grad():
+            iou_coefficients = []
+
+            for idx, (x, yc, ye) in enumerate(loader):
+                classification = self.classifier(x)
+
+                estimator_input = torch.cat((x, classification), dim=1)
+                estimation = self.estimator(estimator_input)
+
+                # Format classification results
+                classification = self.classifier.process_prediction(classification)
+                # Format estimation results
+                estimation = self.estimator.process_prediction(estimation)
+
+                index = idx * estimation.shape[0]
+
+                for pred in estimation:
+                    iou_coefficients.append(iou_coefficient(ye.numpy(), pred.numpy()))
+                    index += 1
+
+                index = idx * classification.shape[0]
+                for pred in classification:
+                    index += 1
+
+        print(f"Average iou coefficient: {sum(iou_coefficients) / len(iou_coefficients)}")
 
         self.classifier.train()
         self.estimator.train()
