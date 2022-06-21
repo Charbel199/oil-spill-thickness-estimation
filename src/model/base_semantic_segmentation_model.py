@@ -76,9 +76,11 @@ class SemanticSegmentationModel(nn.Module):
 
         for batch_idx, (data, targets) in enumerate(loop):
             data = data.to(device=device)
-            targets = targets.float().to(device=device).unsqueeze(dim=1)
+            if not self.normalize_output:
+                targets = targets.long().to(device=device)
+            else:
+                targets = targets.float().to(device=device).unsqueeze(dim=1)
             # forward
-
             predictions = self(data)
             loss = loss_fn(predictions, targets)
 
