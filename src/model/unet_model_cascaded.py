@@ -117,8 +117,8 @@ class SemanticSegmentationCascadedModel():
 
                 index = idx * estimation.shape[0]
 
-                for pred in estimation:
-                    iou_coefficients.append(iou_coefficient(ye.numpy(), pred.numpy()))
+                for i, pred in enumerate(estimation):
+                    iou_coefficients.append(iou_coefficient(ye[i].numpy(), pred.numpy()))
                     index += 1
 
                 index = idx * classification.shape[0]
