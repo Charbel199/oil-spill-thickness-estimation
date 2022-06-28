@@ -3,7 +3,11 @@ import torch
 from tqdm import tqdm
 from visualization.environment_oil_thickness_distribution import visualize_environment
 from model.base_semantic_segmentation_model import SemanticSegmentationModel
-from metrics.iou import iou_coefficient
+from metrics.pixel_wise_iou import pixel_wise_iou
+from metrics.pixel_wise_recall import pixel_wise_recall
+from metrics.pixel_wise_precision import pixel_wise_precision
+from metrics.pixel_wise_dice import pixel_wise_dice
+from metrics.pixel_wise_accuracy import pixel_wise_accuracy
 
 
 class DiceLoss(nn.Module):
@@ -102,7 +106,12 @@ class SemanticSegmentationCascadedModel():
         self.estimator.eval()
 
         with torch.no_grad():
-            iou_coefficients = []
+            iou = []
+            recall = []
+            precision = []
+            accuracy = []
+            dice = []
+
 
             for idx, (x, yc, ye) in enumerate(loader):
                 classification = self.classifier(x)
@@ -118,14 +127,24 @@ class SemanticSegmentationCascadedModel():
                 index = idx * estimation.shape[0]
 
                 for i, pred in enumerate(estimation):
-                    iou_coefficients.append(iou_coefficient(ye[i].numpy(), pred.numpy()))
+                    y_true = ye[i].numpy()
+                    y_pred = pred.numpy()
+                    iou.append(pixel_wise_iou(y_true, y_pred))
+                    accuracy.append(pixel_wise_accuracy(y_true, y_pred))
+                    dice.append(pixel_wise_dice(y_true, y_pred))
+                    precision.append(pixel_wise_precision(y_true, y_pred))
+                    recall.append(pixel_wise_recall(y_true, y_pred))
                     index += 1
 
                 index = idx * classification.shape[0]
                 for pred in classification:
                     index += 1
 
-        print(f"Average iou coefficient: {sum(iou_coefficients) / len(iou_coefficients)}")
+        print(f"Average iou coefficient: {sum(iou) / len(iou)}")
+        print(f"Average dice coefficient: {sum(dice) / len(dice)}")
+        print(f"Average precision coefficient: {sum(precision) / len(precision)}")
+        print(f"Average recall coefficient: {sum(recall) / len(recall)}")
+        print(f"Average accuracy coefficient: {sum(accuracy) / len(accuracy)}")
 
         self.classifier.train()
         self.estimator.train()
