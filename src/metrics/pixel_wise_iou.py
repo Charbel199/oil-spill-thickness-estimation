@@ -7,4 +7,6 @@ def pixel_wise_iou(y_true, y_pred):
 
 
 def _iou(y_true, y_pred):
-    return (y_true & y_pred).sum() / (y_true | y_pred).sum()
+    intersection = (y_true & y_pred).sum()
+    union = (y_true | y_pred).sum()
+    return (intersection / union) if union != 0 else 0

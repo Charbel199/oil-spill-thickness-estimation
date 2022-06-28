@@ -11,5 +11,5 @@ def _accuracy(y_true, y_pred):
     fp = get_fp(y_true, y_pred)
     tn = get_tn(y_true, y_pred)
     fn = get_fn(y_true, y_pred)
-    accuracy = (tp + tn) / (tp + fp + tn + fn)
+    accuracy = ((tp + tn) / (tp + fp + tn + fn)) if (tp + fp + tn + fn) != 0 else 0
     return accuracy

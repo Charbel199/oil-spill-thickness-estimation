@@ -9,5 +9,5 @@ def pixel_wise_precision(y_true, y_pred):
 def _precision(y_true, y_pred):
     tp = get_tp(y_true, y_pred)
     fp = get_fp(y_true, y_pred)
-    precision = tp / (tp + fp)
+    precision = (tp / (tp + fp)) if (tp + fp) != 0 else 0
     return precision

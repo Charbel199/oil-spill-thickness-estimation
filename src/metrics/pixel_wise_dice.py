@@ -10,5 +10,5 @@ def _dice(y_true, y_pred):
     tp = get_tp(y_true, y_pred)
     fn = get_fn(y_true, y_pred)
     fp = get_fp(y_true, y_pred)
-    dice = (2 * tp) / (2 * tp + fn + fp)
+    dice = ((2 * tp) / (2 * tp + fn + fp)) if (2 * tp + fn + fp) != 0 else 0
     return dice
