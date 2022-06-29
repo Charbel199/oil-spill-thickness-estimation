@@ -9,7 +9,7 @@ clear all
 
 % Output size
 number_of_observations = 1;
-number_of_samples = 10000;
+number_of_samples = 11;
 output_file_type = "txt";
 
 % Environment parameters
