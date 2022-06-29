@@ -1,24 +1,27 @@
-function [reflectivities_with_noise]= noise(R, thickness, variance_noise) 
+function [reflectivities_with_noise]= noise(R, variance_noise, number_of_observations, number_of_samples) 
 % R: Theoretical reflectivities for a specific thickness
-% thickness: Corresponding thickness
 % variance_noise: Variance
+% number_of_observations: Number of observations
+% number_of_samples: Number of samples with same thickness
 % --------------------------------------------------------------
 %                   MONTE CARLO SIMULATION
 %  --------------------------------------------------------------
 
-N=1; % number of observations
-Grid_len = 10000; % Number of samples with same thickness
+
 
 number_of_frequencies = size(R,1);
-reflectivities_with_noise = zeros(number_of_frequencies, N,Grid_len);
+reflectivities = zeros(number_of_frequencies, number_of_observations, number_of_samples);
 sigma = sqrt(variance_noise);
 
 for frequency=1:number_of_frequencies
-    for n=1:N
-        reflectivities_with_noise(frequency,n,:) = R(frequency)+sigma.*randn(1,Grid_len);
+    for n=1:number_of_observations
+        reflectivities(frequency,n,:) = R(frequency)+sigma.*randn(1,number_of_samples);
     end
 end
-  
+
+% Compute the mean of the all observations
+reflectivities_with_noise = squeeze(mean(reflectivities, 2));
+
 
 
 
