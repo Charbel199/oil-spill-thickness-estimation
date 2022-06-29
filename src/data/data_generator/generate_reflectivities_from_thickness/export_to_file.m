@@ -1,23 +1,32 @@
-function []= export_to_file(reflectivities, file_name, number_of_frequencies, identifier) 
+function []= export_to_file(reflectivities, file_name, number_of_frequencies, file_type) 
 % reflectivities_with_noise: Reflectivities to add to the file
 % file_name: Beginning of the file name
 % number_of_frequencies: Total number of frequencies
 % thickness: Current thickness
+% file_type: Either txt or csv
+
+
+file_name = strcat(file_name,".",file_type);
 
 % Save data into files
-file_name = strcat(file_name,num2str(identifier),'.txt');
-file=fopen(file_name,'w');
-for i=1: length(reflectivities)
-    row = '';
-    for frequency=1:number_of_frequencies
-        row = row + " " + num2str(reflectivities(frequency,i));
+if file_type == "txt"
+    file=fopen(file_name,'w');
+    for i=1: length(reflectivities)
+        row = '';
+        for frequency=1:number_of_frequencies
+            row = row + " " + num2str(reflectivities(frequency,i));
+        end
+        row = row + "\n";
+        fprintf(file,row);
     end
-    row = row + "\n";
-    fprintf(file,row);
+    
+    fclose(file);
 end
 
-fclose(file);
-
+%% TODO: Fix csv exporter
+if file_type == "csv"
+    writetable(cast(reflectivities,"single"), file_name);
+end
 
 
 end
