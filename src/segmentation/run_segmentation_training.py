@@ -14,7 +14,7 @@ from model.unet_model import UNET
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
 BATCH_SIZE = 10
-NUM_EPOCHS = 20
+NUM_EPOCHS = 5
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
@@ -29,7 +29,7 @@ PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0/pred"
 NUM_OF_CLASSES = 11
 SAVE = False
 LOAD = True
-MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_20epochs.pkl'
+MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0.pkl'
 # ==================================================================================================================
 
 # Normalize if classification
@@ -93,6 +93,7 @@ if not LOAD:
         load_checkpoint(torch.load(MODEL_CHECKPOINT), model)
 
     for epoch in range(NUM_EPOCHS):
+        print(f"Starting epoch {epoch}")
         model.train_fn(train_loader, optimizer, loss_fn)
 
         # save model

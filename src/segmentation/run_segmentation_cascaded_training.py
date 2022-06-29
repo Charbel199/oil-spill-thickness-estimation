@@ -13,26 +13,28 @@ from model.unet_model_classification import UNETClassifier
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
 BATCH_SIZE = 10
-NUM_EPOCHS = 5
+NUM_EPOCHS = 20
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE = False
-LOAD = True
+SAVE = True
+LOAD = False
 SAVE_PREDICTION_IMAGES = False
 EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
 TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/training"
 VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/validation"
 PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/pred"
-CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_classifier_unified_loss.pkl'
-ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_estimator_unified_loss.pkl'
+CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_classifier_unified_loss_20epochs.pkl'
+ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_estimator_unified_loss_20epochs.pkl'
 # ==================================================================================================================
 
-classifier = UNETClassifier(in_channels=4, out_channels=1, normalize_output=True).to(DEVICE)
-estimator = UNET(in_channels=5, out_channels=11, normalize_output=False).to(DEVICE)
+classifier = UNETClassifier(in_channels=4, out_channels=1, normalize_output=True, features=[64, 128, 256, 512]).to(
+    DEVICE)
+estimator = UNET(in_channels=5, out_channels=11, normalize_output=False, features=[32, 64, 128, 256, 512]).to(
+    DEVICE)
 cascaded_model = SemanticSegmentationCascadedModel(classifier=classifier,
                                                    estimator=estimator)
 train_transform = A.Compose(
@@ -99,12 +101,13 @@ if not LOAD:
     estimator.train()
     with torch.autograd.set_detect_anomaly(True):
         for epoch in range(NUM_EPOCHS):
+            print(f"Starting epoch {epoch}")
             cascaded_model.train_fn(loader=train_loader,
                                     opt_classifier=opt_classifier,
                                     opt_estimator=opt_estimator,
                                     criterion_estimator=criterion_estimator,
                                     criterion_classifier=criterion_classifier,
-                                    combined_loss=False,
+                                    combined_loss=True,
                                     opt_all=opt_all,
                                     device=DEVICE)
 
