@@ -4,40 +4,57 @@
 
 clear all
 
-% Parameters
+%% Parameters
 % -----------------------------------------------------------------------
-%f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
-f= [4.3855 6.9759 9.0681 11]*1e9
-ks=[0 0 0 0];
-loss = exp(-4.*(ks*cosd(0)).^2);
-thickness= [1:1:10]; % in mm
-c = 3e8; % speed of light
-lambda= c./f; % EM wavelength
-%s=0.3e-2;
-%ks= (2*pi./lambda).*s
 
-
+% Environment parameters
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
+c = 3e8; % speed of light
+s=0.3e-2; % RMS wave height
+variance_noise= 0.02; % Gaussian noise variance
+
+% Frequencies
+%f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
+f= [4.3855 6.9759 9.0681 11]*1e9;
+lambda= c./f; % EM wavelength
+
+% Surface roughness
+rough_surface = true;
+ks=[0 0 0 0];
+if rough_surface
+    ks = (2*pi./lambda).*s;
+    loss = exp(-4.*(ks*cosd(0)).^2);
+end
+
+% Thicknesses range
+thickness= [0:1:10]; % in mm
+
+% Permittivity range of medium 2, oil
+permittivity_range = [3];
+
+% Dielectric permmittivities of medium 1 and 2
 [epsr_w, epsi_w] = module4_2(temperature_w,f/1e9,salinity_w);
 eps1 = 1; % dielectric permittivity of medium 1, air
 eps3 = epsr_w-epsi_w*1i; % dielectric permittivity of medium 3, saline water
-permittivity_range = [3]
-variance_noise= 0.001;
-% -----------------------------------------------------------------------
 
+% Base file name
+file_name = ["thickness-" num2str(length(f),1) "freqs-variance" num2str(variance_noise, 2) "-"];
+
+% -----------------------------------------------------------------------
+%% 
 
 
 
 % Reflectivity generation
 % -----------------------------------------------------------------------
 for eps2= permittivity_range
-    n1 = sqrt(eps1);
+    n1= sqrt(eps1);
     n2= sqrt(eps2);
     n3= sqrt(eps3);
 
 
-    file_name = "thickness-4freqs-variance0.001-";
+
 
     r = zeros(length(lambda),length(thickness));
     R = zeros(length(lambda),length(thickness)); % Number of frequencies x Number of thicknesses
@@ -58,7 +75,7 @@ for eps2= permittivity_range
 
     for s=1:length(thickness)
         reflectivities_with_noise = noise(R(:,s),thickness(s), variance_noise);
-        export_to_file(reflectivities_with_noise, file_name, size(R(:,s),1), thickness(s));
+        export_to_file(squeeze(reflectivities_with_noise), file_name, size(R(:,s),1), thickness(s));
     end
 end
 % -----------------------------------------------------------------------
