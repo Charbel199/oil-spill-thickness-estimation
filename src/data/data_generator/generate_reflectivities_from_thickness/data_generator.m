@@ -7,6 +7,11 @@ clear all
 %% Parameters
 % -----------------------------------------------------------------------
 
+% Output size
+number_of_observations = 1;
+number_of_samples = 10000;
+output_file_type = "txt";
+
 % Environment parameters
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
@@ -39,7 +44,7 @@ eps1 = 1; % dielectric permittivity of medium 1, air
 eps3 = epsr_w-epsi_w*1i; % dielectric permittivity of medium 3, saline water
 
 % Base file name
-file_name = ["thickness-" num2str(length(f),1) "freqs-variance" num2str(variance_noise, 2) "-"];
+file_name = strcat("thickness-",num2str(length(f),1),"freqs-variance",num2str(variance_noise, 2),"-");
 
 % -----------------------------------------------------------------------
 %% 
@@ -53,15 +58,12 @@ for eps2= permittivity_range
     n2= sqrt(eps2);
     n3= sqrt(eps3);
 
-
-
-
     r = zeros(length(lambda),length(thickness));
     R = zeros(length(lambda),length(thickness)); % Number of frequencies x Number of thicknesses
 
 
-    for p=1:length(lambda) % variation in frequency
-        % reflection coefficient for single interfaces
+    for p=1:length(lambda) % Iterate through each wavelength
+        % Reflection coefficient for single interfaces
         r1 = (n1-n2)/(n1+n2); % air-oil interface
         r2(p)= (n2-n3(p))/(n2+n3(p)); % oil-water interface
         r_free(p) = (r1+r2(p))./(1+r1*r2(p)); % refl coef
@@ -72,10 +74,14 @@ for eps2= permittivity_range
         r(p,:) = (r1+r2(p).*exp(-1j*2.*delta2))./(1+r1*r2(p).*exp(-1j*2.*delta2)); % refl coef
         R(p,:)= (abs(r(p,:))).^2*loss(p); % Reflectivity
     end
-
-    for s=1:length(thickness)
-        reflectivities_with_noise = noise(R(:,s),thickness(s), variance_noise);
-        export_to_file(squeeze(reflectivities_with_noise), file_name, size(R(:,s),1), thickness(s));
+    
+    % For each thickness
+    for thickness_index=1:length(thickness)
+        % Generate reflectivities with noise 
+        reflectivities_with_noise = noise(R(:,thickness_index), variance_noise, number_of_observations, number_of_samples);
+        % Export reflectivities with noise
+        thickness_file_name = strcat(file_name,num2str(thickness(thickness_index)));
+        export_to_file(squeeze(reflectivities_with_noise), thickness_file_name, size(R(:,thickness_index),1), output_file_type);
     end
 end
 % -----------------------------------------------------------------------
