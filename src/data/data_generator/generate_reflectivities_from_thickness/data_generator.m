@@ -9,14 +9,16 @@ clear all
 
 % Output size
 number_of_observations = 1;
-number_of_samples = 11;
+number_of_samples = 10000;
 output_file_type = "txt";
 
 % Environment parameters
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
 c = 3e8; % speed of light
-s=0.3e-2; % RMS wave height
+g = 9.81 % gravity constant
+wind_speed = 1;
+s=(1/2) * sqrt(2) * (0.22 * (wind_speed^2)/g); % RMS wave height % 0.25372231087 for Wind speed of 4 m/s
 variance_noise= 0.02; % Gaussian noise variance
 
 % Frequencies
