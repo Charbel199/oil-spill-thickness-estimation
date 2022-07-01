@@ -25,24 +25,32 @@ class DiceLoss(nn.Module):
         return 1 - dice
 
 
-class SemanticSegmentationCascadedModel():
+class SemanticSegmentationCascadedModel:
     def __init__(
             self, classifier, estimator
     ):
         self.classifier: SemanticSegmentationModel = classifier
         self.estimator: SemanticSegmentationModel = estimator
+        self.batch_count = 0
 
     def train_fn(self, loader, opt_classifier, opt_estimator, opt_all, criterion_classifier, criterion_estimator,
+                 summary_writer,
                  combined_loss=False, device='cpu'):
         # loop = tqdm(loader)
 
         for batch_idx, (data, targets) in enumerate(loader):
+            self.batch_count += 1
             classification_targets, estimator_targets = targets
+            data = data.to(device=device)
+            classification_targets.to(device=device)
+            estimator_targets.to(device=device)
             BATCH_SIZE = data.shape[0]
 
             classified_output = self.classifier(data)
             loss_classifier = criterion_classifier(classified_output.squeeze(), classification_targets)
             print(f"Classifier loss {loss_classifier}")
+            if summary_writer is not None:
+                summary_writer.add_scalar("classifier loss", loss_classifier, self.batch_count)
             if not combined_loss:
                 opt_classifier.zero_grad()
                 loss_classifier.backward(retain_graph=True)
@@ -52,6 +60,8 @@ class SemanticSegmentationCascadedModel():
             estimated_output = self.estimator(estimator_input)
             loss_estimator = criterion_estimator(estimated_output, estimator_targets)
             print(f"Estimator loss {loss_estimator}")
+            if summary_writer is not None:
+                summary_writer.add_scalar("estimator loss", loss_estimator, self.batch_count)
             if not combined_loss:
                 opt_estimator.zero_grad()
                 loss_estimator.backward(retain_graph=True)
@@ -59,11 +69,13 @@ class SemanticSegmentationCascadedModel():
 
             total_loss = 0.8 * loss_classifier + loss_estimator
             print(f"Total loss {total_loss}")
+            if summary_writer is not None:
+                summary_writer.add_scalar("total loss", total_loss, self.batch_count)
             if combined_loss:
                 opt_all.zero_grad()
                 total_loss.backward(retain_graph=True)
                 opt_all.step()
-
+            summary_writer.flush()
             print(f"Done batch {batch_idx}")
 
             # loop.set_postfix(loss=total_loss.item())
@@ -74,7 +86,11 @@ class SemanticSegmentationCascadedModel():
         self.estimator.eval()
 
         with torch.no_grad():
-            for idx, (x, yc, ye) in enumerate(loader):
+            for idx, (x, y) in enumerate(loader):
+                yc, ye = y
+                x.to(device)
+                yc.to(device)
+                ye.to(device)
                 classification = self.classifier(x)
 
                 estimator_input = torch.cat((x, classification), dim=1)
@@ -102,7 +118,7 @@ class SemanticSegmentationCascadedModel():
         self.classifier.train()
         self.estimator.train()
 
-    def evaluate_metrics(self, loader):
+    def evaluate_metrics(self, loader, device ='cuda'):
         self.classifier.eval()
         self.estimator.eval()
 
@@ -113,8 +129,11 @@ class SemanticSegmentationCascadedModel():
             accuracy = []
             dice = []
 
-
-            for idx, (x, yc, ye) in enumerate(loader):
+            for idx, (x, y) in enumerate(loader):
+                yc, ye = y
+                x.to(device)
+                yc.to(device)
+                ye.to(device)
                 classification = self.classifier(x)
 
                 estimator_input = torch.cat((x, classification), dim=1)
