@@ -61,6 +61,9 @@ if not COMPUTE_MEAN_AND_STD:
         ]
     )
 
+# Set criterion
+criterion_classifier = DiceLoss()
+criterion_estimator = nn.CrossEntropyLoss()
 # Set optimizers
 opt_classifier = optim.Adam(classifier.parameters(), lr=LEARNING_RATE)
 opt_estimator = optim.Adam(estimator.parameters(), lr=LEARNING_RATE)
@@ -68,6 +71,7 @@ opt_all = optim.Adam([
     {'params': classifier.parameters()},
     {'params': estimator.parameters()}
 ], lr=LEARNING_RATE)
+
 
 train_loader, val_loader = get_loaders(
     TRAIN_IMG_DIR,
@@ -86,8 +90,7 @@ if COMPUTE_MEAN_AND_STD:
     print(f"Validation dataset mean and std {get_mean_and_std(val_loader)}")
     exit()
 
-criterion_classifier = DiceLoss()
-criterion_estimator = nn.CrossEntropyLoss()
+
 
 
 def _evaluate_model(save_images=False):
@@ -124,7 +127,7 @@ if not LOAD:
             _evaluate_model(save_images= False)
 
         # Final evaluation
-        _evaluate_model(save_images=SAVE_PREDICTION_IMAGES)
+        _evaluate_model()
 
 
 
@@ -133,7 +136,7 @@ else:
     estimator = torch.load(ESTIMATOR_MODEL_PATH)
     cascaded_model = SemanticSegmentationCascadedModel(classifier=classifier,
                                                        estimator=estimator)
-    _evaluate_model(save_images=SAVE_PREDICTION_IMAGES)
+    _evaluate_model()
 
 
 if SAVE:
