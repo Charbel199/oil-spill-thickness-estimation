@@ -17,8 +17,14 @@ class OilEnvironmentDataset(Dataset):
         return len([item for item in self.items if 'x' in item])
 
     def __getitem__(self, index):
-        x = torch.from_numpy(load_np(os.path.join(self.data_dir, f"x{index}"))).float()
-        y = torch.from_numpy(load_np(os.path.join(self.data_dir, f"y{index}"))).float()
+        x_np = load_np(os.path.join(self.data_dir, f"x{index}"))
+        y_np = load_np(os.path.join(self.data_dir, f"ye{index}"))
+
+        if self.transform:
+            x_np = self.transform(image=x_np)['image']
+
+        x = torch.from_numpy(x_np).float()
+        y = torch.from_numpy(y_np).float()
         x = torch.moveaxis(x, -1, 0)
         return x, y
 
@@ -33,11 +39,19 @@ class OilEnvironmentDatasetClassificationAndEstimation(Dataset):
         return len([item for item in self.items if 'x' in item])
 
     def __getitem__(self, index):
-        x = torch.from_numpy(load_np(os.path.join(self.data_dir, f"x{index}"))).float()
-        yc = torch.from_numpy(load_np(os.path.join(self.data_dir, f"yc{index}"))).float()
-        ye = torch.from_numpy(load_np(os.path.join(self.data_dir, f"ye{index}"))).long()
+        x_np = load_np(os.path.join(self.data_dir, f"x{index}"))
+        yc_np = load_np(os.path.join(self.data_dir, f"yc{index}"))
+        ye_np = load_np(os.path.join(self.data_dir, f"ye{index}"))
+
+        if self.transform:
+            x_np = self.transform(image=x_np)['image']
+
+        x = torch.from_numpy(x_np).float()
+        yc = torch.from_numpy(yc_np).float()
+        ye = torch.from_numpy(ye_np).long()
         x = torch.moveaxis(x, -1, 0)
-        return x, yc, ye
+
+        return x, (yc, ye)
 
 
 def get_loaders(
