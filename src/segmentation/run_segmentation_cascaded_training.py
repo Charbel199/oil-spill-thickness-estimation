@@ -8,30 +8,34 @@ from model.unet_model_cascaded import SemanticSegmentationCascadedModel, DiceLos
 from model.unet_model import UNET
 from model.unet_model_classification import UNETClassifier
 from data.datasets.datasets_helpers import get_mean_and_std
+from torch.utils.tensorboard import SummaryWriter
 
 # Parameters
 # ==================================================================================================================
 LEARNING_RATE = 1e-4
 DEVICE = "cpu"
 COMPUTE_MEAN_AND_STD = False
+NORMALIZE = True
 BATCH_SIZE = 10
-NUM_EPOCHS = 20
+NUM_EPOCHS = 10
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
-PIN_MEMORY = True
+PIN_MEMORY = False
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE = False
+SAVE = True
 LOAD = False
-SAVE_PREDICTION_IMAGES = True
+COMBINED_LOSS = True
+SAVE_PREDICTION_IMAGES = False
 EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
 TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/training"
 VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/validation"
 PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/pred"
-CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_classifier_unified_loss_20epochs.pkl'
-ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_estimator_unified_loss_20epochs.pkl'
+CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_normalized_classifier_unified_loss_10epochs.pkl'
+ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_normalized_estimator_unified_loss_10epochs.pkl'
 # ==================================================================================================================
+writer = SummaryWriter("assets/logs/unet_highvariance_with_0_cascaded_normalized_unified_loss_10epochs")
 
 classifier = UNETClassifier(in_channels=4, out_channels=1, normalize_output=True, features=[64, 128, 256, 512]).to(
     DEVICE)
@@ -41,7 +45,7 @@ cascaded_model = SemanticSegmentationCascadedModel(classifier=classifier,
                                                    estimator=estimator)
 train_transform = []
 val_transform = []
-if not COMPUTE_MEAN_AND_STD:
+if not COMPUTE_MEAN_AND_STD and NORMALIZE:
     train_transform = A.Compose(
         [
             A.Normalize(
@@ -72,7 +76,6 @@ opt_all = optim.Adam([
     {'params': estimator.parameters()}
 ], lr=LEARNING_RATE)
 
-
 train_loader, val_loader = get_loaders(
     TRAIN_IMG_DIR,
     VAL_IMG_DIR,
@@ -84,22 +87,19 @@ train_loader, val_loader = get_loaders(
     PIN_MEMORY,
 )
 
-
 if COMPUTE_MEAN_AND_STD:
     print(f"Training dataset mean and std {get_mean_and_std(train_loader)}")
     print(f"Validation dataset mean and std {get_mean_and_std(val_loader)}")
     exit()
 
 
-
-
-def _evaluate_model(save_images=False):
+def _evaluate_model(save_images=True):
     if SAVE_PREDICTION_IMAGES and save_images:
         cascaded_model.save_predictions_as_images(
             val_loader, folder=PRED_IMG_DIR, device=DEVICE
         )
     if EVALUATE_METRICS:
-        cascaded_model.evaluate_metrics(val_loader)
+        cascaded_model.evaluate_metrics(val_loader, device=DEVICE)
 
 
 if not LOAD:
@@ -113,7 +113,8 @@ if not LOAD:
                                     opt_estimator=opt_estimator,
                                     criterion_estimator=criterion_estimator,
                                     criterion_classifier=criterion_classifier,
-                                    combined_loss=True,
+                                    combined_loss=COMBINED_LOSS,
+                                    summary_writer=writer,
                                     opt_all=opt_all,
                                     device=DEVICE)
 
@@ -124,8 +125,9 @@ if not LOAD:
             # }
             # save_checkpoint(checkpoint)
 
-            _evaluate_model(save_images= False)
+            _evaluate_model(save_images=False)
 
+        writer.flush()
         # Final evaluation
         _evaluate_model()
 
@@ -137,7 +139,6 @@ else:
     cascaded_model = SemanticSegmentationCascadedModel(classifier=classifier,
                                                        estimator=estimator)
     _evaluate_model()
-
 
 if SAVE:
     torch.save(cascaded_model.classifier, CLASSIFIER_MODEL_PATH)

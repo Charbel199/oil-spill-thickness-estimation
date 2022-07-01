@@ -9,20 +9,20 @@ from helper.numpy_helpers import *
 # Parameters
 # ==================================================================================================================
 FILE_NAME = 'thickness-4freqs-variance0.02'
-DATA_PATH = f"assets/generated_data/variance_0.02/{FILE_NAME}"
+DATA_PATH = f"assets/generated_data/variance_0.02_windspeed_1/{FILE_NAME}"
 SHOW_REFLECTIVITIES_PLOTS = False
 RES = (1, 1)
 OCTAVES = 2
 OUTPUT_SHAPE = (100, 100)
 SMALLEST_THICKNESS = 0
 LARGEST_THICKNESS = 10
-STARTING_POINT = 30
-NUMBER_OF_DATA_POINTS = 20
-FOR_TRAINING = False
+STARTING_POINT = 150
+NUMBER_OF_DATA_POINTS = 150
+FOR_TRAINING = True
 IS_CLASSIFICATION = True
 CLASSIFICATION_ONLY = False
 INVERTED = True
-OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02/fractals_with_0_cascaded/{'training' if FOR_TRAINING else 'validation'}"
+OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_1/fractals_with_0_cascaded/{'training' if FOR_TRAINING else 'validation'}"
 # ==================================================================================================================
 
 
