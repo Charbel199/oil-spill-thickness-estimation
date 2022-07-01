@@ -36,7 +36,8 @@ class SemanticSegmentationCascadedModel():
                  combined_loss=False, device='cpu'):
         # loop = tqdm(loader)
 
-        for batch_idx, (data, classification_targets, estimator_targets) in enumerate(loader):
+        for batch_idx, (data, targets) in enumerate(loader):
+            classification_targets, estimator_targets = targets
             BATCH_SIZE = data.shape[0]
 
             classified_output = self.classifier(data)
