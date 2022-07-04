@@ -168,3 +168,15 @@ class SemanticSegmentationCascadedModel:
 
         self.classifier.train()
         self.estimator.train()
+
+    def predict(self, x):
+        x = torch.from_numpy(x).float()
+        x = torch.moveaxis(x, -1, 0)
+        x = x[None,:]
+
+        classification = self.classifier(x)
+        # classification = self.classifier.process_prediction(classification)
+        estimator_input = torch.cat((x, classification), dim=1)
+        estimation = self.estimator(estimator_input)
+        estimation = self.estimator.process_prediction(estimation)
+        return estimation
