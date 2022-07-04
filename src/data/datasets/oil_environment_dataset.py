@@ -42,10 +42,11 @@ class OilEnvironmentDatasetClassificationAndEstimation(Dataset):
         x_np = load_np(os.path.join(self.data_dir, f"x{index}"))
         yc_np = load_np(os.path.join(self.data_dir, f"yc{index}"))
         ye_np = load_np(os.path.join(self.data_dir, f"ye{index}"))
-
         if self.transform:
-            x_np = self.transform(image=x_np)['image']
-
+            transform = self.transform(image=x_np, mask1=yc_np, mask2=ye_np)
+            x_np = transform["image"]
+            yc_np = transform["mask1"]
+            ye_np = transform["mask2"]
         x = torch.from_numpy(x_np).float()
         yc = torch.from_numpy(yc_np).float()
         ye = torch.from_numpy(ye_np).long()

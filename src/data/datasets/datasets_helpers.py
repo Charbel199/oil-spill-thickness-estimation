@@ -18,6 +18,16 @@ def get_mean_and_std(data_loader):
     return mean, std
 
 
+def get_max(data_loader):
+    max = float('-inf')
+    for data, _ in data_loader:
+        temp_max = torch.max(data)
+        if temp_max > max:
+            max = temp_max
+
+    return max
+
+
 def get_normalize_transform(data_loader):
     mean, std = get_mean_and_std(data_loader)
     return A.Normalize(
@@ -25,4 +35,3 @@ def get_normalize_transform(data_loader):
         std=std,
         max_pixel_value=1,
     )
-
