@@ -12,32 +12,32 @@ from torch.utils.tensorboard import SummaryWriter
 
 # Parameters
 # ==================================================================================================================
-LEARNING_RATE_COMBINED = 1e-3
+LEARNING_RATE_COMBINED = 7e-4
 LEARNING_RATE_ESTIMATOR = 1e-3
 LEARNING_RATE_CLASSIFIER = 2e-4
 DEVICE = "cpu"
-COMPUTE_MEAN_AND_STD = False
-NORMALIZE = False
-BATCH_SIZE = 30
+COMPUTE_MEAN_AND_STD = True
+NORMALIZE = True
+BATCH_SIZE = 15
 NUM_EPOCHS = 10
 NUM_WORKERS = 0
 IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = False
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE = False
-LOAD = True
-COMBINED_LOSS = False
+SAVE = True
+LOAD = False
+COMBINED_LOSS = True
 SAVE_PREDICTION_IMAGES = True
 EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
-TRAIN_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/training"
-VAL_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/validation"
-PRED_IMG_DIR = "assets/generated_data/variance_0.02/fractals_with_0_cascaded/pred"
-CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_classifier_20epochs.pkl'
-ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_with_0_cascaded_estimator_20epochs.pkl'
+TRAIN_IMG_DIR = "assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded/training"
+VAL_IMG_DIR = "assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded/validation"
+PRED_IMG_DIR = "assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded/pred"
+CLASSIFIER_MODEL_PATH = 'assets/generated_models/unet_highvariance_windspeed_8_cascaded_normalized_classifier_unified_loss_10epochs.pkl'
+ESTIMATOR_MODEL_PATH = 'assets/generated_models/unet_highvariance_windspeed_8_cascaded_normalized_estimator_unified_loss_10epochs.pkl'
 # ==================================================================================================================
-writer = SummaryWriter("assets/logs/unet_highvariance_windspeed_1_with_0_cascaded_normalized_unified_loss_10epochs")
+writer = SummaryWriter("assets/logs/unet_highvariance_windspeed_8_cascaded_normalized_unified_loss_10epochs")
 
 classifier = UNETClassifier(in_channels=4, out_channels=1, normalize_output=True, features=[64, 128, 256, 512]).to(
     DEVICE)
@@ -56,22 +56,25 @@ if not COMPUTE_MEAN_AND_STD and NORMALIZE:
     # max_pixel_value = 1.2243
 
     # Variance 0.02 Windspeed 1
-    mean = [0.0003, 0.0005, 0.0003, -0.0007]
-    std = [0.1417, 0.1409, 0.1416, 0.1415]
-    max_pixel_value = 0.6473100185394287
+    # mean = [0.0003, 0.0005, 0.0003, -0.0007]
+    # std = [0.1417, 0.1409, 0.1416, 0.1415]
+    # max_pixel_value = 0.6473100185394287
 
     # mean = [ 0.0003,  0.0002,  0.0007, -0.0002]
     # std = [0.1421, 0.1413, 0.1417, 0.1416]
     # max_pixel_value = 0.6473100185394287
+
+    # Variance 0.02 Windspeed 1 Observations 5
+    mean = [1.9912e-04,  3.4908e-04, -1.2365e-04, -3.5645e-05]
+    std = [0.0632, 0.0630, 0.0631, 0.0631]
 
     train_transform = A.Compose(
         [
             A.Normalize(
                 mean=mean,
                 std=std,
-                max_pixel_value=max_pixel_value,
-            ),
-            A.Rotate(limit=35, p=1.0),
+                max_pixel_value=1,
+            )
         ],
         additional_targets={'mask1': 'mask',
                             'mask2': 'mask', }
@@ -81,25 +84,13 @@ if not COMPUTE_MEAN_AND_STD and NORMALIZE:
             A.Normalize(
                 mean=mean,
                 std=std,
-                max_pixel_value=max_pixel_value,
+                max_pixel_value=1,
             )
         ],
         additional_targets={'mask1': 'mask',
                             'mask2': 'mask', }
     )
 
-# test_transform = A.Compose(
-#     [
-#         A.Rotate(limit=35, p=1.0),
-#     ]
-# )
-# from helper.numpy_helpers import load_np
-# import os
-#
-# y_np = load_np(os.path.join(TRAIN_IMG_DIR, f"ye{5}"))
-# visualize_environment(y_np,save_fig=False)
-# y2_np = test_transform(image=y_np)['image']
-# visualize_environment(y2_np,save_fig=False)
 
 # Set criterion
 criterion_classifier = DiceLoss()
