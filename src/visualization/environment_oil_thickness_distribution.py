@@ -5,24 +5,28 @@ import random
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from visualization.environments import generate_circle_environment
 
+
+def get_all_index(data_loader: DataLoader, possible_output_value=(0, 10, 1)):
+    smallest_value, largest_value, step_size = possible_output_value
+    thickness_index = {}
+    for thickness in np.arange(smallest_value, largest_value + step_size, step_size):
+        thickness_index[thickness] = np.where(data_loader.all_data_y == thickness)[0]
+    return thickness_index
+
+
 def fill_environment_with_reflectivity_data(
         environment: np.ndarray,
-        data_loader: DataLoader
+        data_loader: DataLoader,
+        possible_output_values=(0, 10, 1)
 ) -> np.ndarray:
-    populated_environment = []
-    for x in range(len(environment)):
-        temp_populated_environment = []
-        for y in range(len(environment[x])):
-            thickness = environment[x][y]
-            thickness_index = np.where(data_loader.all_data_y == thickness)[0]
-            # Get thickness index
-            random_data_point_index = random.randint(0, len(data_loader.all_data_x[thickness_index]) - 1)
-            ref = data_loader.all_data_x[thickness_index][random_data_point_index]
-            temp_populated_environment.append(ref)
+    thickness_index = get_all_index(data_loader, possible_output_values)
 
-        populated_environment.append(temp_populated_environment)
+    def fill_point(x):
+        return np.array(data_loader.all_data_x[thickness_index[x][random.randint(0, len(thickness_index[x]) - 1)]])
 
-    populated_environment = np.array(populated_environment)
+    g = np.vectorize(fill_point, otypes=[np.ndarray])
+    populated_environment = np.array(g(environment).tolist())
+
     return populated_environment
 
 
