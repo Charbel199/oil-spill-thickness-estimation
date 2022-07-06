@@ -16,23 +16,28 @@ output_file_type = "txt";
 temperature_w = 20; % water temperature in degrees
 salinity_w = 30; % salinity in parts per thousand psu
 c = 3e8; % speed of light
-g = 9.81 % gravity constant
-wind_speed = 1;
-s=(1/2) * sqrt(2) * (0.22 * (wind_speed^2)/g); % RMS wave height % 0.25372231087 for Wind speed of 4 m/s
+g = 9.81; % gravity constant
+wind_speeds = [2:2:16]; % Wind speed(10 m above sea) from 2 to 16 m/s 
+rms_heights= [7e-4 7e-4 8e-4 1e-3 1.5e-3 1.6e-3 1.7e-3 1.8e-3]; % RMS Surface height based on https://ieeexplore.ieee.org/abstract/document/1356073
+
+
 variance_noise= 0.02; % Gaussian noise variance
 
 % Frequencies
 %f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
-f= [4.3855 6.9759 9.0681 11]*1e9;
+f= [4:0.5:12]*1e9;
 lambda= c./f; % EM wavelength
 
 % Surface roughness
+wind_speed = 4;
+s = rms_heights(wind_speeds ==  wind_speed);
 rough_surface = true;
-ks=[0 0 0 0];
+ks=zeros(1, length(f));
 if rough_surface
     ks = (2*pi./lambda).*s;
-    loss = exp(-4.*(ks*cosd(0)).^2);
+    loss = exp(-4.*(ks*cosd(0)).^2)
 end
+
 
 % Thicknesses range
 thickness= [0:1:10]; % in mm
@@ -46,7 +51,7 @@ eps1 = 1; % dielectric permittivity of medium 1, air
 eps3 = epsr_w-epsi_w*1i; % dielectric permittivity of medium 3, saline water
 
 % Base file name
-file_name = strcat("thickness-",num2str(length(f),1),"freqs-variance",num2str(variance_noise, 2),"-");
+file_name = strcat("thickness-",num2str(length(f),2),"freqs-variance",num2str(variance_noise, 2),"-");
 
 % -----------------------------------------------------------------------
 %% 
