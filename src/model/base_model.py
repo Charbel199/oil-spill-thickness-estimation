@@ -51,7 +51,8 @@ class Model(object):
         # Classification preprocessing
         if is_classification_problem:
             self.data_loader.all_data_y = self.preprocess_y_data(self.data_loader.all_data_y, number_of_classes)
-
+        else:
+            self.data_loader.all_data_y =  self.data_loader.all_data_y.squeeze()
         kfold = KFold(n_splits=num_of_folds, shuffle=True, random_state=random_state)
         self.kfold_indices = kfold.split(self.data_loader.all_data_x, self.data_loader.all_data_y)
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.data_loader.all_data_x,

@@ -40,5 +40,5 @@ class SVRModel(Model):
         self.epsilon = kwargs.get('epsilon', 0.1)
 
     def create_svr(self):
-        model = SVR(kernel=self.kernel, C=self.C, epsilon=self.epsilon)
+        model = SVR(kernel=self.kernel, C=self.C, epsilon=self.epsilon, verbose=True)
         return model
