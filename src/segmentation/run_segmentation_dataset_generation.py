@@ -9,7 +9,7 @@ import glob
 
 # Parameters
 # ==================================================================================================================
-FILE_NAME = 'thickness-17freqs-variance0.02'
+FILE_NAME = 'thickness-9freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/variance_0.02_windspeed_8/{FILE_NAME}"
 SHOW_REFLECTIVITIES_PLOTS = False
 RES = (1, 1)
@@ -23,8 +23,9 @@ FOR_TRAINING = False
 IS_CLASSIFICATION = True
 CLASSIFICATION_ONLY = False
 INVERTED = False
-TEXT_DIRECTORY = "assets/generated_map"
-OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded/{'training' if FOR_TRAINING else 'validation'}"
+TEXT_DIRECTORY = "assets/generated_map/val"
+OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/{'training' if FOR_TRAINING else 'validation'}"
+
 # ==================================================================================================================
 
 loader = DataLoader()
