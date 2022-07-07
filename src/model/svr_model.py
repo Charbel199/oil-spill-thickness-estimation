@@ -2,6 +2,13 @@ from data.data_loader import DataLoader
 from model.base_model import Model
 from sklearn.svm import SVR
 import pickle
+from metrics.pixel_wise_iou import pixel_wise_iou
+from metrics.pixel_wise_recall import pixel_wise_recall
+from metrics.pixel_wise_precision import pixel_wise_precision
+from metrics.pixel_wise_dice import pixel_wise_dice
+from metrics.pixel_wise_accuracy import pixel_wise_accuracy
+import numpy as np
+from visualization.environment_oil_thickness_distribution import visualize_environment
 
 
 class SVRModel(Model):
@@ -21,7 +28,7 @@ class SVRModel(Model):
 
         # Saving file
         if save_file:
-            self.save_model(f"generated_models/{output_file_name}", extension=output_file_extension)
+            self.save_model(f"{output_file_name}", extension=output_file_extension)
 
     def save_model(self, output_file_name: str, extension: str = "sav"):
         pickle.dump(self.model, open(f"{output_file_name}.{extension}", 'wb'))
@@ -42,3 +49,41 @@ class SVRModel(Model):
     def create_svr(self):
         model = SVR(kernel=self.kernel, C=self.C, epsilon=self.epsilon, verbose=True)
         return model
+
+    def evaluate_metrics(self, x_all, y_all, folder):
+
+        iou = []
+        recall = []
+        precision = []
+        accuracy = []
+        dice = []
+
+        for j in range(len(x_all)):
+            x = x_all[j]
+            ye = y_all[j]
+
+            def pred(x):
+                a = x.reshape(1, -1)
+                return self.predict(a)
+
+            y_pred = np.apply_along_axis(pred, 2, x)
+            y_pred = np.squeeze(y_pred)
+            y_pred = np.rint(y_pred)
+            y_pred[y_pred > 10] = 10
+            y_pred[y_pred < 0] = 0
+
+            y_true = ye
+            iou.append(pixel_wise_iou(y_true, y_pred))
+            accuracy.append(pixel_wise_accuracy(y_true, y_pred))
+            dice.append(pixel_wise_dice(y_true, y_pred))
+            precision.append(pixel_wise_precision(y_true, y_pred))
+            recall.append(pixel_wise_recall(y_true, y_pred))
+            visualize_environment(environment=y_pred, save_fig=True, show_fig=False,
+                                  output_file_name=f"{folder}/pred_estimation_{j}", file_type='jpeg')
+            print(f"Done image {j}")
+
+        print(f"Average iou coefficient: {sum(iou) / len(iou)}")
+        print(f"Average dice coefficient: {sum(dice) / len(dice)}")
+        print(f"Average precision coefficient: {sum(precision) / len(precision)}")
+        print(f"Average recall coefficient: {sum(recall) / len(recall)}")
+        print(f"Average accuracy coefficient: {sum(accuracy) / len(accuracy)}")

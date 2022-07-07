@@ -119,7 +119,7 @@ class Model(object):
                        include_classification_metrics=False,
                        largest_classification_value=10,
                        plot_classification_data=False,
-                       log_evaluation=True,
+                       log_evaluation=False,
                        log_path=None):
         print("Evaluating model ...")
         evaluation = []
