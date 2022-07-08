@@ -105,13 +105,13 @@ class SemanticSegmentationCascadedModel:
 
                 for pred in estimation:
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
-                                          output_file_name=f"{folder}/pred_estimation_{index}", file_type='jpeg')
+                                          output_file_name=f"{folder}/pred_estimation_{index}", file_type='svg')
                     index += 1
                     print(f"Saved estimation environment {index}")
                 index = idx * classification.shape[0]
                 for pred in classification:
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
-                                          output_file_name=f"{folder}/pred_classification_{index}", file_type='jpeg')
+                                          output_file_name=f"{folder}/pred_classification_{index}", file_type='svg')
                     index += 1
                     print(f"Saved classification environment {index}")
 
