@@ -1,5 +1,4 @@
 from sklearn.model_selection import train_test_split
-import numpy as np
 from sklearn import metrics as skmetrics
 from data.data_loader import DataLoader
 from sklearn.metrics import r2_score, mean_squared_error
@@ -10,6 +9,7 @@ from abc import abstractmethod
 from typing import List
 import os
 from sklearn.model_selection import KFold
+import numpy as np
 
 
 class Model(object):
@@ -183,3 +183,7 @@ class Model(object):
         for eval_line in evaluation:
             evaluation_text += eval_line + "\n"
         return evaluation_text
+
+    @abstractmethod
+    def evaluate_metrics(self, x_all, y_all, folder):
+        pass

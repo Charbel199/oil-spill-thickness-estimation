@@ -50,6 +50,7 @@ class SVRModel(Model):
         model = SVR(kernel=self.kernel, C=self.C, epsilon=self.epsilon, verbose=True)
         return model
 
+
     def evaluate_metrics(self, x_all, y_all, folder):
 
         iou = []
@@ -57,16 +58,18 @@ class SVRModel(Model):
         precision = []
         accuracy = []
         dice = []
-
+        counter = 0
         for j in range(len(x_all)):
             x = x_all[j]
             ye = y_all[j]
 
             def pred(x):
                 a = x.reshape(1, -1)
+                print("PREDDING")
                 return self.predict(a)
 
             y_pred = np.apply_along_axis(pred, 2, x)
+
             y_pred = np.squeeze(y_pred)
             y_pred = np.rint(y_pred)
             y_pred[y_pred > 10] = 10
