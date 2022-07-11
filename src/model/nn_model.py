@@ -117,7 +117,7 @@ class NNModel(Model):
         nn_layers = []
         for layer in neural_network:
             if layer[0] == "Input":
-                nn_layers.append(tf.keras.layers.Dense(layer[1], input_shape=(layer[1],)))
+                nn_layers.append(tf.keras.layers.Input(shape=(layer[1],)))
             elif layer[0] == "Dense":
                 nn_layers.append(tf.keras.layers.Dense(layer[1], activation=layer[2]))
         model = tf.keras.models.Sequential(nn_layers)
