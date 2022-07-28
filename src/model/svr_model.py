@@ -65,7 +65,6 @@ class SVRModel(Model):
 
             def pred(x):
                 a = x.reshape(1, -1)
-                print("PREDDING")
                 return self.predict(a)
 
             y_pred = np.apply_along_axis(pred, 2, x)
