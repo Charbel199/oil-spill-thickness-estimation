@@ -4,14 +4,16 @@ from helper.numpy_helpers import load_np
 from visualization.environment_oil_thickness_distribution import visualize_environment
 import numpy as np
 
+
+
 # Parameters
 # ==================================================================================================================
 FILE_NAME = 'thickness-9freqs-variance0.02'
-DATA_PATH = f"assets/generated_data/variance_0.02_windspeed_8/{FILE_NAME}"
-OUTPUT_FILE_NAME = 'assets/generated_models/svr_highvariance_windspeed8_with_0'
-PRED_IMG_DIR = "assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/pred_svr"
-SAVE = False
-LOAD = True
+DATA_PATH = f"assets/generated_data/variance_0.02_all_windspeeds/{FILE_NAME}"
+OUTPUT_FILE_NAME = 'assets/generated_models/svr_highvariance_all_windspeeds_with_0'
+PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/pred/svr"
+SAVE = True
+LOAD = False
 # ==================================================================================================================
 
 loader = DataLoader()
@@ -32,9 +34,10 @@ else:
 
 x_all = []
 y_all = []
-for i in range(30):
-    x_all.append(load_np(f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/validation/x{i}"))
-    y_all.append(load_np(f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/validation/ye{i}"))
+for i in range(63):
+    x_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/x{i}"))
+    y_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/ye{i}"))
+    print(f"Loaded image {i}")
 
 # def pred(x):
 #     a = x.reshape(1, -1)

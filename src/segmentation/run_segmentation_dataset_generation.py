@@ -10,7 +10,7 @@ import glob
 # Parameters
 # ==================================================================================================================
 FILE_NAME = 'thickness-9freqs-variance0.02'
-DATA_PATH = f"assets/generated_data/variance_0.02_windspeed_8/{FILE_NAME}"
+DATA_PATH = f"assets/generated_data/variance_0.02_all_windspeeds/{FILE_NAME}"
 SHOW_REFLECTIVITIES_PLOTS = False
 RES = (1, 1)
 OCTAVES = 2
@@ -18,19 +18,21 @@ OUTPUT_SHAPE = (100, 100)
 SMALLEST_THICKNESS = 0
 LARGEST_THICKNESS = 10
 STARTING_POINT = 0
-NUMBER_OF_DATA_POINTS = 20
-FOR_TRAINING = False
+NUMBER_OF_DATA_POINTS = 401
+FOR_TRAINING = True
 IS_CLASSIFICATION = True
 CLASSIFICATION_ONLY = False
 INVERTED = False
 TEXT_DIRECTORY = "assets/generated_map/val"
-OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/{'training' if FOR_TRAINING else 'validation'}"
+#OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/{'training' if FOR_TRAINING else 'validation'}"
+OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freqs/validation"
+
 
 # ==================================================================================================================
 
 loader = DataLoader()
 possible_output_values = [(0, 10, 1)]
-max_number_of_rows = 10000
+max_number_of_rows = 80000
 loader.load_data_from_file(
     file_name=DATA_PATH,
     file_format="{}-{}.txt",
@@ -107,7 +109,7 @@ def generate_fractals_segmentation_dataset_from_text():
                               output_file_name=os.path.join(OUTPUT_FOLDER_PATH, f'y{i}'),
                               save_fig=True,
                               show_fig=False,
-                              file_type='jpeg')
+                              file_type='svg')
 
         print(f"Saved image {i}")
 

@@ -3,38 +3,61 @@ from model.nn_model import NNModel
 from visualization import error_bars, points_cloud
 from visualization import environment_oil_thickness_distribution as e
 from visualization.environments import generate_circle_environment
-
+from helper.numpy_helpers import load_np
 # Parameters
 # ==================================================================================================================
-FILE_NAME = 'thickness-9freqs-variance0.001-'
-MODEL_NAME = 'new-WITHOUT0-nn-v13-2outputs-thickness-9freqs-variance0.001-10000'
-NEW_MODEL = True
+NEW_MODEL = False
 network_layers = [
     ["Input", 9],
     ["Dense", 12, "relu"],
     ["Dense", 16, "relu"],
     ["Dense", 12, "relu"],
-    ["Dense", 2, "linear"]
+    ["Dense", 1, "linear"]
 ]
+FILE_NAME = 'thickness-9freqs-variance0.02'
+DATA_PATH = f"assets/generated_data/variance_0.02_all_windspeeds/{FILE_NAME}"
+OUTPUT_FILE_NAME = 'assets/generated_models/ann_highvariance_all_windspeeds_with_0'
+PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/pred/ann"
+SAVE = False
+LOAD = True
 # ==================================================================================================================
 
 
 # Data
+# loader = DataLoader()
+# loader.load_data_from_file(
+#     file_name=f"generated_data/{FILE_NAME}",
+#     file_format="{}permittivity{}-{}.txt",
+#     possible_output_values=[(2.8, 3.3, 0.1), (1, 10, 1)],
+#     max_number_of_rows=10000)
 loader = DataLoader()
+possible_output_values = [(0, 10, 1)]
+max_number_of_rows = 20000
 loader.load_data_from_file(
-    file_name=f"generated_data/{FILE_NAME}",
-    file_format="{}permittivity{}-{}.txt",
-    possible_output_values=[(2.8, 3.3, 0.1), (1, 10, 1)],
-    max_number_of_rows=10000)
+    file_name=DATA_PATH,
+    file_format="{}-{}.txt",
+    possible_output_values=possible_output_values,
+    max_number_of_rows=max_number_of_rows)
+
 
 # Training and evaluation
 model = NNModel(data_loader=loader, network_layers=network_layers, loss='mean_squared_error', print_summary=True)
-model.load_model_data(test_size=0.2, is_classification_problem=False, normalize_output=False)
+model.load_model_data(test_size=0.1, is_classification_problem=False, normalize_output=False)
 if NEW_MODEL:
-    model.train_model(output_file_name=MODEL_NAME, save_file=True, epochs=5)
+    model.train_model(output_file_name=OUTPUT_FILE_NAME, save_file=True, epochs=30)
 else:
-    model.load_model(f"generated_models/{MODEL_NAME}")
-model.evaluate_model(model_name=MODEL_NAME, log_evaluation=True, include_classification_metrics=False)
+    model.load_model(f"{OUTPUT_FILE_NAME}")
+
+# model.evaluate_model(model_name=OUTPUT_FILE_NAME, log_evaluation=True, include_classification_metrics=False)
+
+x_all = []
+y_all = []
+for i in range(63):
+    x_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/x{i}"))
+    y_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/ye{i}"))
+    print(f"Loaded image {i}")
+
+model.evaluate_metrics(x_all, y_all, PRED_IMG_DIR)
 # size_to_view = 40
 # y_pred = model.predict(model.x_test[0:size_to_view])
 # for i in range(len(y_pred)):
@@ -42,23 +65,23 @@ model.evaluate_model(model_name=MODEL_NAME, log_evaluation=True, include_classif
 
 
 # Error bars and point clouds evaluation
-save_figs = False
-selected_permittivity = 3
-observed_values = model.y_test[:, 1]
-predicted_values = model.y_pred[:, 1]
-points_cloud.plot_cloud(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessCloud")
-error_bars.generate_error_bars(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessErrorBars")
-
-observed_values = model.y_test[:, 0]
-predicted_values = model.y_pred[:, 0]
-error_bars.generate_error_bars(observed_values, predicted_values, "Observed permittivity", "Predicted permittivity", save_fig=save_figs, output_file_name="PermittivityErrorBars")
-
-# Circle visualization
-env = generate_circle_environment(size=200, smallest_thickness=1, step_size=1)
-e.visualize_environment(env)
-# populated_env_permittivity = e.fill_environment_with_reflectivity_data_2_outputs(env, data_loader=loader, model=model, is_multi_output=True, selected_permittivity=selected_permittivity)
-# print(np.average(populated_env_permittivity))
-populated_env_thickness = e.fill_environment_with_reflectivity_data_2_outputs(env, data_loader=loader, model=model, is_multi_output=True, is_thickness=True,
-                                                                              selected_permittivity=selected_permittivity)
-# e.compare_environments(env, populated_env_permittivity, save_fig=save_figs, output_file_name="Spill vs Permittivity view")
-e.compare_two_environments(env, populated_env_thickness, save_fig=save_figs, output_file_name="Spill vs Thickness view")
+# save_figs = False
+# selected_permittivity = 3
+# observed_values = model.y_test[:, 1]
+# predicted_values = model.y_pred[:, 1]
+# points_cloud.plot_cloud(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessCloud")
+# error_bars.generate_error_bars(observed_values, predicted_values, "Observed thickness (mm)", "Predicted thickness (mm)", save_fig=save_figs, output_file_name="ThicknessErrorBars")
+#
+# observed_values = model.y_test[:, 0]
+# predicted_values = model.y_pred[:, 0]
+# error_bars.generate_error_bars(observed_values, predicted_values, "Observed permittivity", "Predicted permittivity", save_fig=save_figs, output_file_name="PermittivityErrorBars")
+#
+# # Circle visualization
+# env = generate_circle_environment(size=200, smallest_thickness=1, step_size=1)
+# e.visualize_environment(env)
+# # populated_env_permittivity = e.fill_environment_with_reflectivity_data_2_outputs(env, data_loader=loader, model=model, is_multi_output=True, selected_permittivity=selected_permittivity)
+# # print(np.average(populated_env_permittivity))
+# populated_env_thickness = e.fill_environment_with_reflectivity_data_2_outputs(env, data_loader=loader, model=model, is_multi_output=True, is_thickness=True,
+#                                                                               selected_permittivity=selected_permittivity)
+# # e.compare_environments(env, populated_env_permittivity, save_fig=save_figs, output_file_name="Spill vs Permittivity view")
+# e.compare_two_environments(env, populated_env_thickness, save_fig=save_figs, output_file_name="Spill vs Thickness view")
