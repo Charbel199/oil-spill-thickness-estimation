@@ -124,6 +124,7 @@ class SemanticSegmentationModel(nn.Module):
     def save_predictions_as_images(
             self, loader, folder="saved_images", device="cuda"
     ):
+
         self.eval()
         for idx, (x, y) in enumerate(loader):
             x = x.to(device=device)
@@ -134,7 +135,7 @@ class SemanticSegmentationModel(nn.Module):
                 index = idx * predictions.shape[0]
                 for pred in predictions:
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
-                                          output_file_name=f"{folder}/pred_{index}", file_type='svg')
+                                          output_file_name=f"{folder}/pred_{index}", file_type='png')
                     index += 1
 
         self.train()

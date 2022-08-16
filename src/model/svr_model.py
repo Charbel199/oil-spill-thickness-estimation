@@ -81,7 +81,7 @@ class SVRModel(Model):
             precision.append(pixel_wise_precision(y_true, y_pred))
             recall.append(pixel_wise_recall(y_true, y_pred))
             visualize_environment(environment=y_pred, save_fig=True, show_fig=False,
-                                  output_file_name=f"{folder}/pred_estimation_{j}", file_type='svg')
+                                  output_file_name=f"{folder}/pred_estimation_{j}", file_type='png')
             print(f"Done image {j}")
 
         print(f"Average iou coefficient: {sum(iou) / len(iou)}")
