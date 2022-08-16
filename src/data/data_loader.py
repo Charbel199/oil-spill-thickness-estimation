@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from typing import List, Tuple
 import itertools
+from sklearn.utils import shuffle
 
 
 class DataLoader(object):
@@ -62,6 +63,7 @@ class DataLoader(object):
 
         self.all_data_x = np.array(all_data_x)
         self.all_data_y = np.array(all_data_y)
+        self.all_data_x, self.all_data_y = shuffle(self.all_data_x, self.all_data_y, random_state=0)
         print("Loaded data from files")
 
     def save_data(self,
