@@ -77,7 +77,8 @@ def visualize_environment(
         fig_size: int = 25,
         font_size: int = 25,
         save_fig: bool = False,
-        show_fig: bool = True
+        show_fig: bool = True,
+        cmap: str = 'jet'
 ):
     font = {'family': 'sans-serif',
             'weight': 'bold',
@@ -87,8 +88,10 @@ def visualize_environment(
     fig, ax = plt.subplots(figsize=(fig_size, fig_size))
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.2)
-    im = ax.imshow(environment, cmap='jet')
+    im = ax.imshow(environment, cmap=cmap)
     fig.colorbar(im, cax=cax, orientation='vertical')
+    ax.patch.set_edgecolor('black')
+    ax.patch.set_linewidth('3')
     if save_fig:
         plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
     if show_fig:
