@@ -2,8 +2,8 @@ from metrics.metrics_helper import pixel_wise_metrics_evaluation, get_tp, get_fn
 
 
 # iou = Intersection / Union
-def pixel_wise_iou(y_true, y_pred):
-    return pixel_wise_metrics_evaluation(y_true, y_pred, _iou)
+def pixel_wise_iou(y_true, y_pred, per_label = False):
+    return pixel_wise_metrics_evaluation(y_true, y_pred, _iou, per_label)
 
 
 def _iou(y_true, y_pred):

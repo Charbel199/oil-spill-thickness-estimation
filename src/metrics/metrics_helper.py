@@ -2,14 +2,14 @@ import numpy as np
 from helper.general_helpers import filter_classes, avg_list
 
 
-def pixel_wise_metrics_evaluation(y_true, y_pred, func):
+def pixel_wise_metrics_evaluation(y_true, y_pred, func, per_label = False):
     classes = np.unique(y_true, return_counts=False)
     metrics = []
     for c in classes:
         metrics.append(func(filter_classes(y_true, c), filter_classes(y_pred, c)))
-
-    return avg_list(metrics)
-
+    if not per_label:
+        return avg_list(metrics)
+    return metrics
 
 def get_tp(y_true, y_pred):
     return ((y_true == 1) & (y_pred == 1)).sum()
