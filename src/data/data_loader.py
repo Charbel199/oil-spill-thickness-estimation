@@ -15,6 +15,7 @@ class DataLoader(object):
                             file_format: str,
                             possible_output_values: List[Tuple],
                             max_number_of_rows: int = sys.maxsize,
+                            data_index: List = None
                             ):
 
         print("Loading data from files ...")
@@ -49,6 +50,10 @@ class DataLoader(object):
             counter = 0
             for line in file:
                 number_strings = line.split()  # Split the line on runs of whitespace
+                if data_index and len(data_index) != 0:
+                    data_index.sort()
+                    temp_number_strings = [number_strings[i] for i in data_index]
+                    number_strings = temp_number_strings
                 try:
                     numbers = [float(n) for n in number_strings]  # Convert to float
                 except Exception:
