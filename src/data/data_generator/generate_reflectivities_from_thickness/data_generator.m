@@ -25,11 +25,12 @@ variance_noise= 0.02; % Gaussian noise variance
 
 % Frequencies
 %f= [4.3855 6.9759 9.0681]*1e9; % frequency range of EM in GHz  4.151,7.743,7.939 or 11
-f= [4:0.5:12]*1e9;
+f= [3:1:14]*1e9;
+%f= [4 4.5 5 6 7 7.5 8 9 10 10.5 11 12]*1e9;
 lambda= c./f; % EM wavelength
 
 % Surface roughness
-wind_speed = 4;
+wind_speed = 8;
 s = rms_heights(wind_speeds ==  wind_speed);
 rough_surface = true;
 ks=zeros(1, length(f));
