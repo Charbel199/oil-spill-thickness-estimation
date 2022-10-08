@@ -25,12 +25,12 @@ LOAD_MODEL_FROM_CHECKPOINT = False
 SAVE_PREDICTION_IMAGES = True
 EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
-TRAIN_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/training"
+TRAIN_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_training"
 VAL_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation"
-PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/pred/non_cascaded"
+PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_pred/unet"
 NUM_OF_CLASSES = 11
-SAVE = True
-LOAD = False
+SAVE = False
+LOAD = True
 MODEL_PATH = 'assets/generated_models/unet_highvariance_all_windspeeds_cascaded_normalized_10epochs_9freq.pkl'
 # ==================================================================================================================
 
@@ -55,7 +55,7 @@ if not COMPUTE_MEAN_AND_STD and NORMALIZE:
     # mean = [0.5410, 0.5144, 0.5050, 0.5052, 0.5038, 0.4999, 0.4904, 0.4743, 0.4515]
     # std = [0.1906, 0.1978, 0.1927, 0.1887, 0.1871, 0.1842, 0.1811, 0.1793, 0.1853]
 
-    # Variance 0.02 Windspeed 8 - 9 freq
+    # Variance 0.02 All windspeeds   - 9 freq
     mean = [0.5716, 0.5487, 0.5370, 0.5315, 0.5248, 0.5176, 0.5071, 0.4919, 0.4735]
     std = [0.1772, 0.1867, 0.1848, 0.1821, 0.1792, 0.1769, 0.1742, 0.1729, 0.1764]
 
