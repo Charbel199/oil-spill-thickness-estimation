@@ -1,3 +1,4 @@
+import numpy as np
 import torch.nn as nn
 import torch
 from tqdm import tqdm
@@ -8,6 +9,9 @@ from metrics.pixel_wise_recall import pixel_wise_recall
 from metrics.pixel_wise_precision import pixel_wise_precision
 from metrics.pixel_wise_dice import pixel_wise_dice
 from metrics.pixel_wise_accuracy import pixel_wise_accuracy
+from visualization.histograms import plot_histograms
+from helper.numpy_helpers import save_np
+from helper.general_helpers import avg_list
 
 
 class DiceLoss(nn.Module):
@@ -48,7 +52,7 @@ class SemanticSegmentationCascadedModel:
 
             classified_output = self.classifier(data)
             loss_classifier = criterion_classifier(classified_output.squeeze(), classification_targets)
-            print(f"Classifier loss {loss_classifier}")
+            # print(f"Classifier loss {loss_classifier}")
             if summary_writer is not None:
                 summary_writer.add_scalar("classifier loss", loss_classifier, self.batch_count)
             if not combined_loss:
@@ -59,7 +63,7 @@ class SemanticSegmentationCascadedModel:
             estimator_input = torch.cat((data, classified_output.detach()), dim=1)
             estimated_output = self.estimator(estimator_input)
             loss_estimator = criterion_estimator(estimated_output, estimator_targets)
-            print(f"Estimator loss {loss_estimator}")
+            # print(f"Estimator loss {loss_estimator}")
             if summary_writer is not None:
                 summary_writer.add_scalar("estimator loss", loss_estimator, self.batch_count)
             if not combined_loss:
@@ -68,7 +72,7 @@ class SemanticSegmentationCascadedModel:
                 opt_estimator.step()
 
             total_loss = 0.8 * loss_classifier + loss_estimator
-            print(f"Total loss {total_loss}")
+            # print(f"Total loss {total_loss}")
             if summary_writer is not None:
                 summary_writer.add_scalar("total loss", total_loss, self.batch_count)
             if combined_loss:
@@ -76,7 +80,7 @@ class SemanticSegmentationCascadedModel:
                 total_loss.backward(retain_graph=True)
                 opt_all.step()
             summary_writer.flush()
-            print(f"Done batch {batch_idx}")
+            # print(f"Done batch {batch_idx}")
 
             # loop.set_postfix(loss=total_loss.item())
 
@@ -118,16 +122,23 @@ class SemanticSegmentationCascadedModel:
         self.classifier.train()
         self.estimator.train()
 
-    def evaluate_metrics(self, loader, device ='cuda'):
+    def evaluate_metrics(self, loader, device='cuda'):
         self.classifier.eval()
         self.estimator.eval()
 
         with torch.no_grad():
             iou = []
+            iou_per_class = []
             recall = []
             precision = []
             accuracy = []
             dice = []
+
+            iou_classification = []
+            recall_classification = []
+            precision_classification = []
+            accuracy_classification = []
+            dice_classification = []
 
             for idx, (x, y) in enumerate(loader):
                 yc, ye = y
@@ -150,6 +161,7 @@ class SemanticSegmentationCascadedModel:
                     y_true = ye[i].numpy()
                     y_pred = pred.numpy()
                     iou.append(pixel_wise_iou(y_true, y_pred))
+                    iou_per_class.append(pixel_wise_iou(y_true, y_pred, per_label=True))
                     accuracy.append(pixel_wise_accuracy(y_true, y_pred))
                     dice.append(pixel_wise_dice(y_true, y_pred))
                     precision.append(pixel_wise_precision(y_true, y_pred))
@@ -157,8 +169,76 @@ class SemanticSegmentationCascadedModel:
                     index += 1
 
                 index = idx * classification.shape[0]
-                for pred in classification:
+                pred_detect = {
+                    1: 0,
+                    2: 0,
+                    3: 0,
+                    4: 0,
+                    5: 0,
+                    6: 0,
+                    7: 0,
+                    8: 0,
+                    9: 0,
+                    10: 0
+                }
+                total_detect = {
+                    1: 0,
+                    2: 0,
+                    3: 0,
+                    4: 0,
+                    5: 0,
+                    6: 0,
+                    7: 0,
+                    8: 0,
+                    9: 0,
+                    10: 0
+                }
+                for i, pred in enumerate(classification):
+                    y_true = yc[i].numpy()
+                    ye_true = ye[i].numpy()
+                    y_pred = pred.numpy()
+                    y_pred[y_pred >= 0.5] = 1
+                    y_pred[y_pred < 0.5] = 0
+
+                    for i, row in enumerate(y_pred):
+                        for j, point in enumerate(row):
+                            thickness = ye_true[i][j]
+                            if thickness == 0:
+                                continue
+                            total_detect[thickness] += 1
+                            if y_pred[i][j] == 1:
+                                pred_detect[thickness] += 1
+
+                    # visualize_environment(y_true, cmap='Greys')
+                    # visualize_environment(y_pred, cmap='Greys', save_fig=True, output_file_name="./test",file_type='svg')
+                    iou_classification.append(pixel_wise_iou(y_true, y_pred))
+                    accuracy_classification.append(pixel_wise_accuracy(y_true, y_pred))
+                    dice_classification.append(pixel_wise_dice(y_true, y_pred))
+                    precision_classification.append(pixel_wise_precision(y_true, y_pred))
+                    recall_classification.append(pixel_wise_recall(y_true, y_pred))
                     index += 1
+
+        for key in list(total_detect.keys()):
+            print(f"Avg for {key} is {(pred_detect[key] / total_detect[key]) * 100}")
+        avg_iou_per_class = []
+        for i in range(11):
+            temp = []
+            for iou in iou_per_class:
+                if len(iou) < 11:
+                    continue
+                temp.append(iou[i])
+
+            avg_iou_per_class.append(avg_list(temp))
+
+        print(f"Average iou classification per label coefficient: {avg_iou_per_class}")
+
+        print(f"Average iou classification coefficient: {sum(iou_classification) / len(iou_classification)}")
+        print(f"Average dice classification coefficient: {sum(dice_classification) / len(dice_classification)}")
+        print(
+            f"Average precision classification coefficient: {sum(precision_classification) / len(precision_classification)}")
+        print(f"Average recall classification coefficient: {sum(recall_classification) / len(recall_classification)}")
+        print(
+            f"Average accuracy classification coefficient: {sum(accuracy_classification) / len(accuracy_classification)}")
 
         print(f"Average iou coefficient: {sum(iou) / len(iou)}")
         print(f"Average dice coefficient: {sum(dice) / len(dice)}")
@@ -170,9 +250,9 @@ class SemanticSegmentationCascadedModel:
         self.estimator.train()
 
     def predict(self, x):
-        x = torch.from_numpy(x).float()
-        x = torch.moveaxis(x, -1, 0)
-        x = x[None,:]
+        x = x.float()
+        # x = torch.moveaxis(x, -1, 0)
+        # x = x[None,:]
 
         classification = self.classifier(x)
         # classification = self.classifier.process_prediction(classification)
