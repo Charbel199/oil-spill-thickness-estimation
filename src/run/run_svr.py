@@ -1,19 +1,17 @@
 from data.data_loader import DataLoader
 from model.svr_model import SVRModel
-from helper.numpy_helpers import load_np
+from helper.numpy_helpers import load_np, save_np
 from visualization.environment_oil_thickness_distribution import visualize_environment
 import numpy as np
-
-
 
 # Parameters
 # ==================================================================================================================
 FILE_NAME = 'thickness-9freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/variance_0.02_all_windspeeds/{FILE_NAME}"
 OUTPUT_FILE_NAME = 'assets/generated_models/svr_highvariance_all_windspeeds_with_0'
-PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/pred/svr"
-SAVE = True
-LOAD = False
+PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_pred/svr"
+SAVE = False
+LOAD = True
 # ==================================================================================================================
 
 loader = DataLoader()
@@ -32,24 +30,40 @@ if not LOAD:
 else:
     svr.load_model(OUTPUT_FILE_NAME)
 
+# Evaluation
+
 x_all = []
 y_all = []
-for i in range(63):
-    x_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/x{i}"))
-    y_all.append(load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/ye{i}"))
+for i in range(2):
+    x_all.append(
+        load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_training/x{i}"))
+    y_all.append(
+        load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_training/ye{i}"))
     print(f"Loaded image {i}")
 
-# def pred(x):
-#     a = x.reshape(1, -1)
-#     return svr.predict(a)
-#
-#
-# tt = np.apply_along_axis(pred, 2, input_data)
-# tt = np.squeeze(tt)
-# tt = np.rint(tt)
-# print("DONE")
-# visualize_environment(tt)
-# visualize_environment(gt)
+# svr.evaluate_metrics(x_all, y_all, PRED_IMG_DIR)
 
-svr.evaluate_metrics(x_all, y_all, PRED_IMG_DIR)
-print("DONE")
+# Specific output evaluation
+
+x = load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/x14")
+ye = load_np(f"assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation/ye14")
+
+
+def pred(x):
+    a = x.reshape(1, -1)
+    return svr.predict(a)
+
+
+y_pred = np.apply_along_axis(pred, 2, x)
+
+y_pred = np.squeeze(y_pred)
+y_pred = np.rint(y_pred)
+y_pred[y_pred > 10] = 10
+y_pred[y_pred < 0] = 0
+preds = []
+for i, row in enumerate(ye):
+    for j, point in enumerate(row):
+        if point == 3:
+            preds.append(y_pred[i][j])
+preds_np = np.array(preds)
+save_np(preds_np, 'svr_3mm')
