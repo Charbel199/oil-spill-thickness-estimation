@@ -11,23 +11,32 @@ import glob
 # ==================================================================================================================
 FILE_NAME = 'thickness-9freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/real_data_updated/vibrations/{FILE_NAME}"
+
 SHOW_REFLECTIVITIES_PLOTS = False
 RES = (1, 1)
 OCTAVES = 2
+INVERTED = False
+
 OUTPUT_SHAPE = (100, 100)
 SMALLEST_THICKNESS = 0
 LARGEST_THICKNESS = 10
+
 STARTING_POINT = 0
 NUMBER_OF_DATA_POINTS = 60
+
 FOR_TRAINING = True
 IS_CLASSIFICATION = True
 CLASSIFICATION_ONLY = False
-INVERTED = False
+
+
 TEXT_DIRECTORY = "assets/generated_map/val"
 # OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/{'training' if FOR_TRAINING else 'validation'}"
 OUTPUT_FOLDER_PATH = f"assets/generated_data/real_data_updated/val_with_vibrations"
-
+# Inputs: Parameters - CSV DIRECTORY - OUTPUT DIRECTORY - DATA PATH (Reflectivities path Ex: 10 txt file 0 -> 10 mm)
+# Takes CSV thickness distribution, map reflectivities based on files generated from matlab and outputs inputs and ouputs
+# Output: In the output directory -> x0 ye0 yc0 ... x1 ye1 yc1 ...
 # ==================================================================================================================
+
 
 loader = DataLoader()
 possible_output_values = [(0, 10, 1)]
