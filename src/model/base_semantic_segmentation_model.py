@@ -136,7 +136,7 @@ class SemanticSegmentationModel(nn.Module):
                 index = idx * predictions.shape[0]
                 for pred in predictions:
                     print(f"{folder}/pred_{index}")
-                    visualize_environment(environment=pred, save_fig=True, show_fig=False,
+                    visualize_environment(environment=pred.cpu(), save_fig=True, show_fig=False,
                                           output_file_name=f"{folder}/pred_{index}", file_type='png')
                     index += 1
 
