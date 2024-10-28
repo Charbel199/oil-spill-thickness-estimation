@@ -9,8 +9,14 @@ import glob
 
 # Parameters
 # ==================================================================================================================
+
+# INPUT: Data coming from MATLAB simulation (in txt format)
 FILE_NAME = 'thickness-9freqs-variance0.02'
 DATA_PATH = f"assets/generated_data/real_data_updated/vibrations/{FILE_NAME}"
+# INPUT: Thickness distribution coming from Oil Spill Simulation (in csv format)
+CSV_DIRECTORY = "assets/generated_map/val"
+# OUTPUT: Output directory for the generated data
+OUTPUT_FOLDER_PATH = f"assets/generated_data/real_data_updated/val_with_vibrations"
 
 SHOW_REFLECTIVITIES_PLOTS = False
 RES = (1, 1)
@@ -29,9 +35,7 @@ IS_CLASSIFICATION = True
 CLASSIFICATION_ONLY = False
 
 
-TEXT_DIRECTORY = "assets/generated_map/val"
-# OUTPUT_FOLDER_PATH = f"assets/generated_data/variance_0.02_windspeed_8/fluids_cascaded_9freq/{'training' if FOR_TRAINING else 'validation'}"
-OUTPUT_FOLDER_PATH = f"assets/generated_data/real_data_updated/val_with_vibrations"
+
 # Inputs: Parameters - CSV DIRECTORY - OUTPUT DIRECTORY - DATA PATH (Reflectivities path Ex: 10 txt file 0 -> 10 mm)
 # Takes CSV thickness distribution, map reflectivities based on files generated from matlab and outputs inputs and ouputs
 # Output: In the output directory -> x0 ye0 yc0 ... x1 ye1 yc1 ...
@@ -96,7 +100,7 @@ def generate_fractals_segmentation_dataset():
 
 
 def generate_fractals_segmentation_dataset_from_text():
-    dataset_path = TEXT_DIRECTORY + "/*.csv"
+    dataset_path = CSV_DIRECTORY + "/*.csv"
     for i, file in enumerate(glob.glob(dataset_path)):
         if i > NUMBER_OF_DATA_POINTS:
             break
