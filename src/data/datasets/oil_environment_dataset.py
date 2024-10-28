@@ -5,8 +5,6 @@ import torch
 from torch.utils.data import DataLoader
 
 
-# Need to override __init__, __len__, __getitem__
-# as per datasets requirement
 class OilEnvironmentDataset(Dataset):
     def __init__(self, data_dir, transform=None):
         self.data_dir = data_dir

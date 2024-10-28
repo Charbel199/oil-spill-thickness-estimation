@@ -11,18 +11,17 @@ from helper.general_helpers import avg_list
 class UNET(SemanticSegmentationModel):
 
     def __init__(
-            self, in_channels=3, out_channels=1, features=[64, 128, 256, 512], normalize_output=False
+            self, in_channels=3, out_channels=1, features=[64, 128, 256, 512], normalize_output=False, device="cuda"
     ):
-        super().__init__(in_channels, out_channels, features, normalize_output)
-        self.cuda()
-        summary(self, (9, 100,100))
+        super().__init__(in_channels, out_channels, features, normalize_output, device)
+       # summary(self, (10, 100,100))
 
     def process_prediction(self, predictions):
         predictions = torch.nn.functional.softmax(predictions, dim=1)
         predictions = torch.argmax(predictions, dim=1)
         return predictions
 
-    def evaluate_metrics(self, loader):
+    def evaluate_metrics(self, loader, num_classes=11):
         self.eval()
 
 
@@ -35,14 +34,14 @@ class UNET(SemanticSegmentationModel):
             dice = []
 
             for idx, (x, y) in enumerate(loader):
-                predictions = self(x)
+                predictions = self(x.to(self.device))
                 predictions = self.process_prediction(predictions)
 
                 index = idx * predictions.shape[0]
 
                 for i, pred in enumerate(predictions):
                     y_true = y[i].numpy()
-                    y_pred = pred.numpy()
+                    y_pred = pred.cpu().numpy()
                     iou_per_class.append(pixel_wise_iou(y_true, y_pred, per_label=True))
                     iou.append(pixel_wise_iou(y_true, y_pred))
                     accuracy.append(pixel_wise_accuracy(y_true, y_pred))
@@ -52,10 +51,10 @@ class UNET(SemanticSegmentationModel):
                     index += 1
 
         avg_iou_per_class = []
-        for i in range(11):
+        for i in range(num_classes):
             temp = []
             for iou in iou_per_class:
-                if len(iou) < 11:
+                if len(iou) < num_classes:
                     continue
                 temp.append(iou[i])
 

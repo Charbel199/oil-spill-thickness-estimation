@@ -24,13 +24,14 @@ class DoubleConv(nn.Module):
 
 class SemanticSegmentationModel(nn.Module):
     def __init__(
-            self, in_channels=3, out_channels=1, features=[64, 128, 256, 512], normalize_output=False
+            self, in_channels=3, out_channels=1, features=[64, 128, 256, 512], normalize_output=False, device="cuda"
     ):
         super(SemanticSegmentationModel, self).__init__()
         self.normalize_output = normalize_output
         self.ups = nn.ModuleList()
         self.downs = nn.ModuleList()
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.device = device
 
         # Down part of UNET
         for feature in features:
@@ -134,6 +135,7 @@ class SemanticSegmentationModel(nn.Module):
 
                 index = idx * predictions.shape[0]
                 for pred in predictions:
+                    print(f"{folder}/pred_{index}")
                     visualize_environment(environment=pred, save_fig=True, show_fig=False,
                                           output_file_name=f"{folder}/pred_{index}", file_type='png')
                     index += 1

@@ -91,7 +91,7 @@ def visualize_environment(
     im = ax.imshow(environment, cmap=cmap)
     fig.colorbar(im, cax=cax, orientation='vertical')
     ax.patch.set_edgecolor('black')
-    ax.patch.set_linewidth('3')
+    ax.patch.set_linewidth(3)
     if save_fig:
         plt.savefig(f'{output_file_name}.{file_type}', format=file_type)
     if show_fig:
