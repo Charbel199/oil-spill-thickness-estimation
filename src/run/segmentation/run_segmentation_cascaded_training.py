@@ -37,17 +37,20 @@ NORMALIZE = True
 NUM_WORKERS = 0
 PIN_MEMORY = False
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE = False
-LOAD = True
+SAVE = True
+LOAD = False
 EVALUATE_METRICS = True
 NUMBER_OF_FEATURES = 9  # Ex: Number of input frequencies
-MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
-TRAIN_IMG_DIR = f"assets/generated_data/variance_0.02_all_windspeeds/all_frequencies/{NUMBER_OF_FEATURES}/train"
-VAL_IMG_DIR = f"assets/generated_data/real_data_updated/val_with_vibrations"
+MODEL_CHECKPOINT = "my_checkpoint3.pth.tar"
+
+TRAIN_IMG_DIR = "assets/training"
+VAL_IMG_DIR = "assets/validation"
+PRED_IMG_DIR = "assets/pred_cascaded"
+
+
 SAVE_PREDICTION_IMAGES = True
-PRED_IMG_DIR = f"assets/generated_data/real_data_updated/pred_with_vibrations"
-CLASSIFIER_MODEL_PATH = f'assets/generated_models/all_frequencies/unet_highvariance_all_windspeeds_cascaded_normalized_classifier_unified_loss_10epochs_{NUMBER_OF_FEATURES}freq_lr8e-4.pkl'
-ESTIMATOR_MODEL_PATH = f'assets/generated_models/all_frequencies/unet_highvariance_all_windspeeds_cascaded_normalized_estimator_unified_loss_10epochs_{NUMBER_OF_FEATURES}freq_lr8e-4.pkl'
+CLASSIFIER_MODEL_PATH = f'assets/unet_highvariance_all_windspeeds_cascaded_normalized_classifier_unified_loss_10epochs_{NUMBER_OF_FEATURES}freq_lr8e-4.pkl'
+ESTIMATOR_MODEL_PATH = f'assets/unet_highvariance_all_windspeeds_cascaded_normalized_estimator_unified_loss_10epochs_{NUMBER_OF_FEATURES}freq_lr8e-4.pkl'
 print(f"Working on {NUMBER_OF_FEATURES} features")
 
 # Inputs: Parameters - TRAIN and Validation directories (Output from run_segmentation_dataset_generation.py) + Model paths

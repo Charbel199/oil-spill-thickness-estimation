@@ -11,8 +11,8 @@ from model.unet_model import UNET
 
 # Parameters
 # ==================================================================================================================
-LEARNING_RATE = 1e-4
-DEVICE = "cpu"
+LEARNING_RATE = 8e-4
+DEVICE = "cuda"
 COMPUTE_MEAN_AND_STD = False
 NORMALIZE = True
 BATCH_SIZE = 16
@@ -22,20 +22,20 @@ IMAGE_HEIGHT = 80  # 1280 originally
 IMAGE_WIDTH = 80  # 1918 originally
 PIN_MEMORY = True
 LOAD_MODEL_FROM_CHECKPOINT = False
-SAVE_PREDICTION_IMAGES = True
+SAVE_PREDICTION_IMAGES = False
 EVALUATE_METRICS = True
 MODEL_CHECKPOINT = "my_checkpoint2.pth.tar"
-TRAIN_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_training"
-VAL_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/validation"
-PRED_IMG_DIR = "assets/generated_data/variance_0.02_all_windspeeds/fluids_cascaded_9freq/custom_pred/unet"
+TRAIN_IMG_DIR = "assets/training"
+VAL_IMG_DIR = "assets/validation"
+PRED_IMG_DIR = "assets/pred2"
 NUM_OF_CLASSES = 11
-SAVE = False
-LOAD = True
-MODEL_PATH = 'assets/generated_models/unet_highvariance_all_windspeeds_cascaded_normalized_10epochs_9freq.pkl'
+SAVE = True
+LOAD = False
+MODEL_PATH = 'assets/unet_highvariance_all_windspeeds_normalized_10epochs_7freq.pkl'
 # ==================================================================================================================
 
 # Normalize if classification
-model = UNET(in_channels=9, out_channels=NUM_OF_CLASSES, normalize_output=False).to(DEVICE)
+model = UNET(in_channels=9, out_channels=NUM_OF_CLASSES, normalize_output=False, device=DEVICE).to(DEVICE)
 
 train_transform = []
 val_transform = []
@@ -58,6 +58,11 @@ if not COMPUTE_MEAN_AND_STD and NORMALIZE:
     # Variance 0.02 All windspeeds   - 9 freq
     mean = [0.5716, 0.5487, 0.5370, 0.5315, 0.5248, 0.5176, 0.5071, 0.4919, 0.4735]
     std = [0.1772, 0.1867, 0.1848, 0.1821, 0.1792, 0.1769, 0.1742, 0.1729, 0.1764]
+
+
+    # Variance 0.02 All windspeeds   - 7 freq
+    # mean = [0.5487, 0.5370, 0.5315, 0.5248, 0.5176, 0.5071, 0.4919]
+    # std = [0.1867, 0.1848, 0.1821, 0.1792, 0.1769, 0.1742, 0.1729]
 
     train_transform = A.Compose(
         [
@@ -113,7 +118,7 @@ def _evaluate_model(save_images=True):
     # check accuracy
     if EVALUATE_METRICS:
         model.check_accuracy(val_loader, device=DEVICE)
-        model.evaluate_metrics(val_loader)
+        model.evaluate_metrics(val_loader, num_classes=NUM_OF_CLASSES)
 
 
 if not LOAD:
@@ -123,7 +128,7 @@ if not LOAD:
 
     for epoch in range(NUM_EPOCHS):
         print(f"Starting epoch {epoch}")
-        model.train_fn(train_loader, optimizer, loss_fn)
+        model.train_fn(train_loader, optimizer, loss_fn, device=DEVICE)
 
         # save model
         checkpoint = {
