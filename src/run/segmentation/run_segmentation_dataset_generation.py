@@ -82,4 +82,4 @@ def generate_npy_segmentation_dataset_from_text():
 
 
 if __name__ == "__main__":
-    generate_fractals_segmentation_dataset_from_text()
+    generate_npy_segmentation_dataset_from_text()
