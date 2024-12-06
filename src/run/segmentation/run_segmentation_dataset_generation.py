@@ -52,54 +52,7 @@ loader.load_data_from_file(
     max_number_of_rows=max_number_of_rows)
 
 
-def generate_fractals_segmentation_dataset():
-    # Data
-    if SHOW_REFLECTIVITIES_PLOTS:
-        env = generate_fractal_environment(smallest_thickness=SMALLEST_THICKNESS, largest_thickness=LARGEST_THICKNESS,
-                                           shape=OUTPUT_SHAPE, res=RES, octaves=OCTAVES, inverted=INVERTED)
-        if IS_CLASSIFICATION:
-            env[env != 0] = 1
-        visualize_environment(environment=env,
-                              save_fig=False,
-                              show_fig=True)
-        reflect_env = fill_environment_with_reflectivity_data(environment=env, data_loader=loader)
-
-        visualize_environment(environment=reflect_env[:, :, 0],
-                              save_fig=False,
-                              show_fig=True)
-        visualize_environment(environment=reflect_env[:, :, 1],
-                              save_fig=False,
-                              show_fig=True)
-        visualize_environment(environment=reflect_env[:, :, 2],
-                              save_fig=False,
-                              show_fig=True)
-        visualize_environment(environment=reflect_env[:, :, 3],
-                              save_fig=False,
-                              show_fig=True)
-
-    for i in range(STARTING_POINT, STARTING_POINT + NUMBER_OF_DATA_POINTS):
-        env = generate_fractal_environment(smallest_thickness=SMALLEST_THICKNESS, largest_thickness=LARGEST_THICKNESS,
-                                           shape=OUTPUT_SHAPE, res=RES, octaves=OCTAVES, inverted=INVERTED)
-        reflect_env = fill_environment_with_reflectivity_data(environment=env, data_loader=loader,
-                                                              possible_output_values=possible_output_values[0])
-        save_np(reflect_env, os.path.join(OUTPUT_FOLDER_PATH, f'x{i}'))
-        if IS_CLASSIFICATION:
-            classification_env = env.copy()
-            classification_env[classification_env != 0] = 1
-            save_np(classification_env, os.path.join(OUTPUT_FOLDER_PATH, f'yc{i}'))
-            if CLASSIFICATION_ONLY:
-                continue
-        save_np(env, os.path.join(OUTPUT_FOLDER_PATH, f'ye{i}'))
-        visualize_environment(environment=env,
-                              output_file_name=os.path.join(OUTPUT_FOLDER_PATH, f'y{i}'),
-                              save_fig=True,
-                              show_fig=False,
-                              file_type='jpeg')
-
-        print(f"Saved image {i}")
-
-
-def generate_fractals_segmentation_dataset_from_text():
+def generate_npy_segmentation_dataset_from_text():
     dataset_path = CSV_DIRECTORY + "/*.csv"
     for i, file in enumerate(glob.glob(dataset_path)):
         if i > NUMBER_OF_DATA_POINTS:
@@ -130,4 +83,3 @@ def generate_fractals_segmentation_dataset_from_text():
 
 if __name__ == "__main__":
     generate_fractals_segmentation_dataset_from_text()
-    # generate_fractals_segmentation_dataset()
